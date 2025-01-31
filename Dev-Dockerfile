@@ -1,0 +1,14 @@
+ARG FROM_IMAGE=netboxcommunity/netbox
+ARG FROM_TAG=v4.1-3.0.2
+ARG FROM=${FROM_IMAGE}:${FROM_TAG}
+FROM ${FROM}
+
+ENV VIRTUAL_ENV=/opt/netbox/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+COPY ./adestis_netbox_certificate_management /source/adestis-netbox-certificate-management/adestis_netbox_certificate_management/
+COPY ./setup.py /source/adestis-netbox-certificate-management/
+COPY ./MANIFEST.in /source/adestis-netbox-certificate-management/
+COPY ./README.md /source/adestis-netbox-certificate-management/
+
+RUN pip3 install --no-warn-script-location /source/adestis-netbox-certificate-management/

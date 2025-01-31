@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+recursive-include adestis_netbox_certificate_management/templates *
+recursive-include adestis_netbox_certificate_management/static *
