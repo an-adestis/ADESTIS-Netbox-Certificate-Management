@@ -1,0 +1,29 @@
+name: "local_docker_netbox_certificate_management_plugin"
+services:
+  netbox: &netbox
+    image: adestis-netbox-certificate-management-plugin:latest
+    build:
+      context: ../
+      dockerfile: Dev-Dockerfile
+    user: root
+    depends_on:
+    - postgres
+    - redis
+    - redis-cache
+    ports:
+      - "13000:8080"
+    environment:
+      SKIP_SUPERUSER: "false"
+      SUPERUSER_EMAIL: "admin@adestis.de"
+      SUPERUSER_NAME: "admin"
+      SUPERUSER_PASSWORD: "admin"
+      DEVELOPER: "True"
+      DEBUG: "True"
+      DB_WAIT_DEBUG: "1"
+    # docker compose run netbox sh -c "python manage.py makemigrations adestis_netbox_certificate_management"
+    # volumes:
+    #   - ../adestis_netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/adestis_netbox_certificate_management/migrations
+  netbox-worker:
+    <<: *netbox
+  netbox-housekeeping:
+    <<: *netbox
