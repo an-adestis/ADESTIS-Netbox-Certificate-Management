@@ -21,12 +21,12 @@ services:
       DEBUG: "True"
       DB_WAIT_DEBUG: "1"
       
-    # docker-compose run netbox sh -c "python manage.py makemigrations adestis_netbox_applications"
+    # docker-compose run netbox sh -c "python manage.py makemigrations netbox_cars"
     # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/base_requirements.txt
     # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/requirements-container.txt
     # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/requirements.txt
     volumes:
-     - ./../adestis_netbox_applications/migrations:/opt/netbox/venv/lib/python3.12/site-packages/adestis_netbox_applications/migrations:rw
+     - ./../netbox_cars/migrations:/opt/netbox/venv/lib/python3.12/site-packages/netbox_cars/migrations:rw
   netbox-worker:
     image: adestis-netbox-plugin-account-management-plugin:latest
     build:

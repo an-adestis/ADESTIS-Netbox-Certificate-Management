@@ -6,14 +6,12 @@
 
 PLUGINS = [
     #"netbox_bgp",
-    "adestis_netbox_applications",
-    # "adestis_netbox_plugin_account_management",
-    # "netbox_data_flows"
+    "netbox_cars",
+    "adestis_netbox_applications"
 ]
 
 PLUGINS_CONFIG = {
-    "adestis_netbox_applications": {},
-    # "adestis_netbox_plugin_account_management": {},
-    # "netbox_bgp": {},
-    # "netbox_data_flows": {}
+    "netbox_cars": {},
+    "adestis_netbox_plugin_applications": {},
+    
 }
