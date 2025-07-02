@@ -116,9 +116,16 @@ class Cars(NetBoxModel):
         blank=True
     )
     
+    installedapplication = django_models.ManyToManyField(
+        'adestis_netbox_applications.InstalledApplication',
+        related_name='certificate',
+        verbose_name='Applications',
+        blank = True
+    ) 
+    
     class Meta:
-        verbose_name_plural = "Applications"
-        verbose_name = 'Application'
+        verbose_name_plural = "Cars"
+        verbose_name = 'Car'
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_cars:cars', args=[self.pk])

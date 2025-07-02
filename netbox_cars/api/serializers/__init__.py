@@ -1,1 +1,1 @@
-from .application_serializer import *
+from .car_serializer import *

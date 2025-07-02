@@ -2,6 +2,8 @@ from django.urls import path
 from netbox.views.generic import ObjectChangeLogView
 from netbox_cars.models import *
 from netbox_cars.views import *
+from netbox_cars.views.cars import *
+from netbox_cars.models import *
 from django.urls import include
 from utilities.urls import get_model_urls
 
@@ -26,6 +28,8 @@ urlpatterns = (
          CarsEditView.as_view(), name='cars_edit'),
     path('cars/<int:pk>/delete/',
          CarsDeleteView.as_view(), name='cars_delete'),
+    path('cars/applications/', InstalledApplicationAffectedCarsView.as_view(),
+         name='carsapplications_list'),
     path('cars/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='cars_changelog', kwargs={
         'model': Cars
     }),

@@ -1,7 +1,7 @@
 from django import forms
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms.fields import CommentField, CSVChoiceField, TagFilterField
-from netbox_cars.models.application import Cars, CarsStatusChoices
+from netbox_cars.models.cars import Cars, CarsStatusChoices
 from django.utils.translation import gettext_lazy as _
 from utilities.forms.rendering import FieldSet
 from utilities.forms.fields import (
@@ -27,12 +27,12 @@ class CarsForm(NetBoxModelForm):
         FieldSet('name', 'description', 'url', 'tags', 'status', 'version', name=_('Application')),
         FieldSet('tenant_group', 'tenant',  name=_('Tenant')), 
         FieldSet('manufacturer', 'cluster', 'cluster_group', 'virtual_machine', name=_('Virtualization')),   
-        FieldSet('device', name=_('Device'))
+        FieldSet('device', 'installedapplication', name=_('Device'))
     )
 
     class Meta:
         model = Cars
-        fields = ['name', 'description', 'url', 'tags', 'status', 'tenant', 'tenant_group', 'manufacturer', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'comments', 'version']
+        fields = ['name', 'description', 'url', 'tags', 'status', 'tenant', 'tenant_group', 'manufacturer', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'comments', 'version', 'installedapplication']
         
         help_texts = {
             'status': "Example text",
