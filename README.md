@@ -18,13 +18,13 @@ This plugin provide following Model:
 The plugin is available as a Python package in pypi and can be installed with pip  
 
 ```
-pip install adestis_netbox_applications
+pip install netbox_cars
 ```
 Enable the plugin in /etc/netbox/config/configuration.py:
 ```
-PLUGINS = ['adestis_netbox_applications']
+PLUGINS = ['netbox_cars']
 ```
-Restart NetBox and add `adestis_netbox_applications` to your local_requirements.txt
+Restart NetBox and add `netbox_cars` to your local_requirements.txt
 
 See [NetBox Documentation](https://docs.netbox.dev/en/stable/plugins/#installing-plugins) for details
 

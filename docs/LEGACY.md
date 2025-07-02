@@ -5,7 +5,7 @@ Netbox `v3.5-2.6.1` is required.
 
 ## PIP Package
 
-[Click here](https://pypi.org/project/adestis-netbox-applications/)
+[Click here](https://pypi.org/project/adestis-netbox-cars/)
 
 ## Development instructions
 
@@ -21,8 +21,8 @@ Download the Plugin and build from the source:
 
 ```
 $ git clone https://github.com/adestis/netbox-account-management
-$ cd adestis-netbox-applications
-$ docker build -f Dev-Dockerfile -t adestis-netbox-applications-plugin .
+$ cd adestis-netbox-cars
+$ docker build -f Dev-Dockerfile -t adestis-netbox-cars-plugin .
 ```
 
 Update a netbox image name in **docker-compose.yml** in a Netbox Community Docker project root:
@@ -30,7 +30,7 @@ Update a netbox image name in **docker-compose.yml** in a Netbox Community Docke
 ```yaml
 services:
   netbox: &netbox
-    image: adestis-netbox-applications-plugin:latest
+    image: adestis-netbox-cars-plugin:latest
 ```
 
 Rebuild the running docker containers:
@@ -45,7 +45,7 @@ Stop the application container. Then add PLUGINS parameter and PLUGINS_CONFIG pa
 stored in netbox-docker/configuration/ by default:
 
 ```python
-PLUGINS = ['adestis_netbox_applications']
+PLUGINS = ['netbox_cars']
 ```
 
 After that you can start the application again and check the swagger file on `http://localhost:13000/api/schema/swagger-ui/` or access the graphql api on `http://localhost:13000/graphql/` !
@@ -58,7 +58,7 @@ Remove the MAX_PATH limitation (see https://docs.python.org/3/using/windows.html
 
 ### How to create a migration
 
-Mount the migrations folder, start the infrastructure services and run `docker-compose run netbox sh -c "python manage.py makemigrations adestis_netbox_applications"`. After that unmount the migrations folder and rebuild the docker container
+Mount the migrations folder, start the infrastructure services and run `docker-compose run netbox sh -c "python manage.py makemigrations netbox_cars"`. After that unmount the migrations folder and rebuild the docker container
 
 ## FAQ
 

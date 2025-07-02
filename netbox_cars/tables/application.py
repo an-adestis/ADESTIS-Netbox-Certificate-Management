@@ -1,9 +1,9 @@
 from netbox.tables import NetBoxTable, ChoiceFieldColumn, columns
-from adestis_netbox_applications.models import InstalledApplication
-from adestis_netbox_applications.filtersets import *
+from netbox_cars.models import Cars
+from netbox_cars.filtersets import *
 
 
-class InstalledApplicationTable(NetBoxTable):
+class CarsTable(NetBoxTable):
     status = ChoiceFieldColumn()
 
     comments = columns.MarkdownColumn()
@@ -21,7 +21,7 @@ class InstalledApplicationTable(NetBoxTable):
     )
 
     class Meta(NetBoxTable.Meta):
-        model = InstalledApplication
+        model = Cars
         fields = ['name', 'status', 'tenant', 'version', 'url', 'description', 'tags', 'tenant_group', 'manufacturer', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'comments',]
         default_columns = [ 'name', 'tenant', 'version', 'status' ]
         

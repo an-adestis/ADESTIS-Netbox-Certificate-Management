@@ -7,12 +7,12 @@ from dcim.models import *
 from virtualization.models import *
 
 __all__ = (
-    'InstalledApplicationStatusChoices',
-    'InstalledApplication',
+    'CarsStatusChoices',
+    'Cars',
 )
 
-class InstalledApplicationStatusChoices(ChoiceSet):
-    key = 'InstalledApplications.status'
+class CarsStatusChoices(ChoiceSet):
+    key = 'Carss.status'
 
     STATUS_ACTIVE = 'active'
     STATUS_INACTIVE = 'inactive'
@@ -22,11 +22,11 @@ class InstalledApplicationStatusChoices(ChoiceSet):
         (STATUS_INACTIVE, 'Inactive', 'red'),
     ]
     
-class InstalledApplication(NetBoxModel):
+class Cars(NetBoxModel):
 
     status = django_models.CharField(
         max_length=50,
-        choices=InstalledApplicationStatusChoices,
+        choices=CarsStatusChoices,
         verbose_name='Status',
         help_text='Status'
     )
@@ -34,6 +34,7 @@ class InstalledApplication(NetBoxModel):
     comments = django_models.TextField(
         blank=True
     )
+    
     
     name = django_models.CharField(
         max_length=150
@@ -55,57 +56,64 @@ class InstalledApplication(NetBoxModel):
     virtual_machine = django_models.ForeignKey(
           to='virtualization.VirtualMachine',
           on_delete = django_models.PROTECT,
-          related_name= 'applications_virtual_machine',
+          related_name= 'cars_virtual_machine',
           null=True,
-          verbose_name='Virtual Machine'
+          verbose_name='Virtual Machine',
+          blank=True
     )
     
     device = django_models.ForeignKey(
         to = 'dcim.Device',
         on_delete = django_models.PROTECT,
-        related_name= 'applications_device',
+        related_name= 'cars_device',
         null = True,
-        verbose_name='Device'
+        verbose_name='Device',
+        blank=True
     )
     
     tenant = django_models.ForeignKey(
          to = 'tenancy.Tenant',
          on_delete = django_models.PROTECT,
-         related_name = 'applications_tenant',
+         related_name = 'cars_tenant',
          null = True,
-         verbose_name='Tenant'
+         verbose_name='Tenant',
+         blank=True
      )
     
     tenant_group = django_models.ForeignKey(
         to= 'tenancy.TenantGroup',
         on_delete= django_models.PROTECT,
-        related_name='applications_tenant_group',
+        related_name='cars_tenant_group',
         null = True,
-        verbose_name= 'Tenant Group'
+        verbose_name= 'Tenant Group',
+        blank=True
     )
     
     manufacturer = django_models.ForeignKey(
         to= 'dcim.Manufacturer',
         on_delete= django_models.PROTECT,
-        related_name= 'applications_manufacturer',
+        related_name= 'cars_manufacturer',
         null= True,
-        verbose_name='Manufacturer'
+        verbose_name='Manufacturer',
+        blank=True
     )
     
     cluster = django_models.ForeignKey(
         to = 'virtualization.Cluster',
         on_delete = django_models.PROTECT,
-        related_name = 'applications_cluster',
+        related_name = 'cars_cluster',
         null = True,
-        verbose_name='Cluster'
+        verbose_name='Cluster',
+        blank=True
     )
     
     cluster_group = django_models.ForeignKey(
         to = 'virtualization.ClusterGroup',
         on_delete = django_models.PROTECT,
-        related_name = 'applications_cluster_group',
+        related_name = 'cars_cluster_group',
         null = True,
-        verbose_name='Cluster Group'
+        verbose_name='Cluster Group',
+        blank=True
     )
     
     class Meta:
@@ -113,10 +121,10 @@ class InstalledApplication(NetBoxModel):
         verbose_name = 'Application'
 
     def get_absolute_url(self):
-        return reverse('plugins:adestis_netbox_applications:installedapplication', args=[self.pk])
+        return reverse('plugins:netbox_cars:cars', args=[self.pk])
 
     def get_status_color(self):
-        return InstalledApplicationStatusChoices.colors.get(self.status)
+        return CarsStatusChoices.colors.get(self.status)
     
     def __str__(self):
         return self.name 

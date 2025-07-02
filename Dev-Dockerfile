@@ -6,11 +6,12 @@ FROM ${FROM}
 ENV VIRTUAL_ENV=/opt/netbox/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY ./adestis_netbox_applications /source/adestis-netbox-applications/adestis_netbox_applications/
-COPY ./setup.py /source/adestis-netbox-applications/
-COPY ./MANIFEST.in /source/adestis-netbox-applications/
-COPY ./README.md /source/adestis-netbox-applications/
-COPY ./docker/requirements-container.txt /source/adestis-netbox-applications/
+COPY ./netbox_cars /source/adestis-netbox-cars/netbox_cars/
+COPY ./setup.py /source/adestis-netbox-cars/
+COPY ./MANIFEST.in /source/adestis-netbox-cars/
+COPY ./README.md /source/adestis-netbox-cars/
+COPY ./docker/requirements-container.txt /source/adestis-netbox-cars/
 COPY ./docker/configuration/configuration.py /etc/netbox/config/configuration.py
-RUN /usr/local/bin/uv pip install /source/adestis-netbox-applications/
-RUN /usr/local/bin/uv pip install -r /source/adestis-netbox-applications/requirements-container.txt
+RUN /usr/local/bin/uv pip install /source/adestis-netbox-cars/
+RUN /usr/local/bin/uv pip install -r /source/adestis-netbox-cars/requirements-container.txt
+RUN /usr/local/bin/uv pip install adestis-netbox-applications==1.0.13

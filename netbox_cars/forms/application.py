@@ -1,7 +1,7 @@
 from django import forms
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms.fields import CommentField, CSVChoiceField, TagFilterField
-from adestis_netbox_applications.models.application import InstalledApplication, InstalledApplicationStatusChoices
+from netbox_cars.models.application import Cars, CarsStatusChoices
 from django.utils.translation import gettext_lazy as _
 from utilities.forms.rendering import FieldSet
 from utilities.forms.fields import (
@@ -15,13 +15,13 @@ from dcim.models import *
 from virtualization.models import *
 
 __all__ = (
-    'InstalledApplicationForm',
-    'InstalledApplicationFilterForm',
-    'InstalledApplicationBulkEditForm',
-    'InstalledApplicationCSVForm',
+    'CarsForm',
+    'CarsFilterForm',
+    'CarsBulkEditForm',
+    'CarsCSVForm',
 )
 
-class InstalledApplicationForm(NetBoxModelForm):
+class CarsForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet('name', 'description', 'url', 'tags', 'status', 'version', name=_('Application')),
@@ -31,16 +31,16 @@ class InstalledApplicationForm(NetBoxModelForm):
     )
 
     class Meta:
-        model = InstalledApplication
+        model = Cars
         fields = ['name', 'description', 'url', 'tags', 'status', 'tenant', 'tenant_group', 'manufacturer', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'comments', 'version']
         
         help_texts = {
             'status': "Example text",
         }
 
-class InstalledApplicationBulkEditForm(NetBoxModelBulkEditForm):
+class CarsBulkEditForm(NetBoxModelBulkEditForm):
     pk = forms.ModelMultipleChoiceField(
-        queryset=InstalledApplication.objects.all(),
+        queryset=Cars.objects.all(),
         widget=forms.MultipleHiddenInput, 
     )
     
@@ -70,7 +70,7 @@ class InstalledApplicationBulkEditForm(NetBoxModelBulkEditForm):
 
     status = forms.ChoiceField(
         required=False,
-        choices=InstalledApplicationStatusChoices,
+        choices=CarsStatusChoices,
     )
     
     description = forms.CharField(
@@ -120,7 +120,7 @@ class InstalledApplicationBulkEditForm(NetBoxModelBulkEditForm):
         label=_("Cluster")
     )
     
-    model = InstalledApplication
+    model = Cars
 
     fieldsets = (
         FieldSet('name', 'description', 'url', 'tags', 'status', 'version', 'comments', name=_('Application')),
@@ -133,9 +133,9 @@ class InstalledApplicationBulkEditForm(NetBoxModelBulkEditForm):
          'add_tags', 'remove_tags', 'description', ''
     ]
     
-class InstalledApplicationFilterForm(NetBoxModelFilterSetForm):
+class CarsFilterForm(NetBoxModelFilterSetForm):
     
-    model = InstalledApplication
+    model = Cars
 
     fieldsets = (
         FieldSet('q', 'index',),
@@ -150,7 +150,7 @@ class InstalledApplicationFilterForm(NetBoxModelFilterSetForm):
     )
 
     status = forms.MultipleChoiceField(
-        choices=InstalledApplicationStatusChoices,
+        choices=CarsStatusChoices,
         required=False,
         label=_('Status')
     )
@@ -220,10 +220,10 @@ class InstalledApplicationFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
     
-class InstalledApplicationCSVForm(NetBoxModelImportForm):
+class CarsCSVForm(NetBoxModelImportForm):
 
     status = CSVChoiceField(
-        choices=InstalledApplicationStatusChoices,
+        choices=CarsStatusChoices,
         help_text=_('Status'),
         required=True,
     )
@@ -285,9 +285,9 @@ class InstalledApplicationCSVForm(NetBoxModelImportForm):
     )
 
     class Meta:
-        model = InstalledApplication
+        model = Cars
         fields = ['name' ,'status',  'url', 'tenant', 'tenant_group', 'manufacturer', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'description',  'tags', 'comments', 'version']
-        default_return_url = 'plugins:adestis_netbox_applications:InstalledApplication_list'
+        default_return_url = 'plugins:netbox_cars:Cars_list'
 
 
     

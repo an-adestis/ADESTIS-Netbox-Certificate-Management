@@ -43,7 +43,7 @@
 
 1. Öffne das Terminal und navigiere zum Docker-Verzeichnis.
 2. Baue und starte den Docker-Container.
-3. In Docker: Öffne **local_docker_netbox_applications_plugin**.
+3. In Docker: Öffne **local_docker_netbox_cars_plugin**.
 4. In VS-Code: Gehe zu **Ports** und füge den Port `13000` hinzu.
 5. Warte, bis der Docker-Container vollständig geladen ist.
 
@@ -94,7 +94,7 @@
 3. Um Migrationen zu erstellen, führe im Terminal den Befehl:
 
    ```shell
-   docker-compose run netbox sh -c "python manage.py makemigrations adestis_netbox_applications
+   docker-compose run netbox sh -c "python manage.py makemigrations netbox_cars
    ```
 
 > **Erfolg!** 🎉
@@ -146,7 +146,7 @@
    - Erstelle eine Migration, um die Änderungen in der Datenbank zu übernehmen.
    - Verwende den folgenden Befehl, um Migrationen zu erstellen:
      ```shell
-     docker-compose run netbox sh -c "python manage.py makemigrations adestis_netbox_applications"
+     docker-compose run netbox sh -c "python manage.py makemigrations netbox_cars"
      ```
 
 > **Erfolg!** 🎉

@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='adestis-netbox-applications',
+    name='netbox-cars',
     version='1.0.2',
     description='ADESTIS Applications',
     # url='https://github.com/adestis/netbox-account-management',
@@ -13,7 +13,7 @@ setup(
     license='MIT License',
     keywords=['netbox', 'netbox-plugin', 'plugin'],
     package_data={
-        "adestis_netbox_applications": ["**/*.html"],
+        "netbox-cars": ["**/*.html"],
         '': ['LICENSE'],
     }
 )

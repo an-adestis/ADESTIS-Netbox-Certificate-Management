@@ -1,9 +1,9 @@
 from netbox.api.routers import NetBoxRouter
 from . import views
 
-app_name = 'adestis_netbox_applications'
+app_name = 'netbox_cars'
 
 router = NetBoxRouter()
-router.register('applications', views.InstalledApplicationViewSet)
+router.register('cars', views.CarsViewSet)
 
 urlpatterns = router.urls
