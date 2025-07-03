@@ -1,4 +1,4 @@
-name: "local_docker_netbox_account_management_plugin"
+name: "local_docker_netbox_certificate_management_plugin"
 services:
   netbox: &netbox
     image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
@@ -22,7 +22,10 @@ services:
     - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
   netbox-worker:
     # <<: *netbox
-    image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
+    image: netbox-certificate-management-plugin:latest
+    build:
+      context: ../
+      dockerfile: Dev-Dockerfile
     depends_on:
       netbox:
         condition: service_healthy
@@ -32,6 +35,8 @@ services:
     - rqworker
     env_file: env/netbox.env
     user: 'unit:root'
+    ports:
+      - "13002:8080"
     healthcheck:
       start_period: 20s
       timeout: 3s
@@ -42,6 +47,7 @@ services:
     - netbox-media-files:/opt/netbox/netbox/media:rw
     - netbox-reports-files:/opt/netbox/netbox/reports:rw
     - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
+    - ../netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/netbox_certificate_management/migrations
 
   # netbox-housekeeping:
   #   <<: *netbox
@@ -98,7 +104,7 @@ volumes:
     driver_opts:
         type: "none"
         o: "bind"
-        device: "../../data/local_account_management_plugin/postgres"
+        device: "../../data/local_netbox_certificate_management_plugin/postgres"
   netbox-redis-cache-data:
     driver: local
   netbox-redis-data:

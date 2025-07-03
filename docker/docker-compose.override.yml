@@ -1,7 +1,7 @@
 name: "local_docker_netbox_account_management_plugin"
 services:
   netbox: &netbox
-    image: adestis-netbox-plugin-account-management-plugin:latest
+    image: netbox-certificate-management-plugin:latest
     user: root
     build:
       context: ../
@@ -21,16 +21,16 @@ services:
       DEBUG: "True"
       DB_WAIT_DEBUG: "1"
       
-    # docker-compose run netbox sh -c "python manage.py makemigrations netbox_cars"
+    # docker-compose run netbox sh -c "python manage.py makemigrations netbox_certificate_management"
     # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/base_requirements.txt
     # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/requirements-container.txt
     # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/requirements.txt
     volumes:
-     - ./../netbox_cars/migrations:/opt/netbox/venv/lib/python3.12/site-packages/netbox_cars/migrations:rw
-  netbox-worker:
-    image: adestis-netbox-plugin-account-management-plugin:latest
-    build:
-      context: ../
-      dockerfile: Dev-Dockerfile
+     - ./../netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/netbox_certificate_management/migrations:rw
+  # netbox-worker:
+  #   image: adestis-netbox-plugin-account-management-plugin:latest
+  #   build:
+  #     context: ../
+  #     dockerfile: Dev-Dockerfile
   # netbox-housekeeping:
   #   <<: *netbox

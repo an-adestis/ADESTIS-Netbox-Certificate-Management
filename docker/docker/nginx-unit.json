@@ -25,7 +25,7 @@
       },
       {
         "action": {
-          "pass": "cars/netbox"
+          "pass": "certificate/netbox"
         }
       }
     ],
@@ -40,7 +40,7 @@
       }
     ]
   },
-  "cars": {
+  "certificate": {
     "netbox": {
       "type": "python 3",
       "path": "/opt/netbox/netbox/",

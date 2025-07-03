@@ -18,13 +18,13 @@ This plugin provide following Model:
 The plugin is available as a Python package in pypi and can be installed with pip  
 
 ```
-pip install netbox_cars
+pip install netbox_certificate_management
 ```
 Enable the plugin in /etc/netbox/config/configuration.py:
 ```
-PLUGINS = ['netbox_cars']
+PLUGINS = ['netbox_certificate_management']
 ```
-Restart NetBox and add `netbox_cars` to your local_requirements.txt
+Restart NetBox and add `netbox_certificate_management` to your local_requirements.txt
 
 See [NetBox Documentation](https://docs.netbox.dev/en/stable/plugins/#installing-plugins) for details
 

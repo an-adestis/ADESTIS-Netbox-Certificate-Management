@@ -1,4 +1,4 @@
 include README.md
 include LICENSE
-recursive-include netbox_cars/templates *
-recursive-include netbox_cars/static *
+recursive-include netbox_certificate_management/templates *
+recursive-include netbox_certificate_management/static *

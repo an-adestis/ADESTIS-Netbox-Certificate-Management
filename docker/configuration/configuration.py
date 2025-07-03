@@ -256,7 +256,7 @@ if 'PAGINATE_COUNT' in environ:
 
 # # Enable installed plugins. Add the name of each plugin to the list.
 PLUGINS = [
-    "netbox_cars",
+    "netbox_certificate_management",
     # "adestis-netbox-plugin-account-management",
     # "netbox-bgp",
     # "netbox-data-flows"
