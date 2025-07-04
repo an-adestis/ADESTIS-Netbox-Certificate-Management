@@ -20,6 +20,18 @@ class CertificateTable(NetBoxTable):
     name = columns.MarkdownColumn(
         linkify=True
     )
+    
+    valid_from = columns.DateColumn()
+    
+    valid_to = columns.DateColumn()
+    
+    tenant = tables.Column(
+        linkify = True
+    )
+    
+    tenant_group = tables.Column(
+        linkify = True
+    )
 
     description = columns.MarkdownColumn()
     
@@ -30,9 +42,45 @@ class CertificateTable(NetBoxTable):
     installedapplication = tables.Column(
         linkify=True
     )
+    
+    contact = tables.Column(
+        linkify=True
+    )
+    
+    virtual_machine = tables.Column(
+        linkify=True
+    )
+    
+    cluster_group = tables.Column(
+        linkify=True
+    )
+        
+    cluster = tables.Column(
+        linkify=True
+    )
+        
+    device = tables.Column(
+        linkify=True
+    )
+    
+    predecessor_certificate = tables.Column(
+        linkify=True
+    )
+    
+    successor_certificates = tables.Column(
+        linkify=True
+    )
+    
+    issuer_parent_certificate = tables.Column(
+        linkify=True
+    )
+    
+    authority_key_identifier = tables.Column(
+        linkify=True
+    )
 
     class Meta(NetBoxTable.Meta):
         model = Certificate
-        fields = ['name', 'status', 'tenant', 'version', 'description', 'tags', 'tenant_group', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'comments', 'installedapplication']
-        default_columns = [ 'name', 'tenant', 'status' ]
+        fields = ['name', 'status',   'description', 'tags',  'comments', 'valid_from', 'valid_to', 'contact_group', 'authority_key_identifier', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'tenant', 'installedapplication', 'tenant_group', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'contact', 'successor_certificates', 'predecessor_certificate', 'certificate']
+        default_columns = [ 'name', 'tenant', 'status', 'valid_from', 'valid_to', 'authority_key_identifier' ]
         

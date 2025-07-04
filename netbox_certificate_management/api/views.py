@@ -1,5 +1,5 @@
 from netbox_certificate_management.models import Certificate
-# from netbox_certificate_management.filtersets import CertificateFilterSet
+from netbox_certificate_management.filtersets.certificate import CertificateFilterSet
 from netbox.api.viewsets import NetBoxModelViewSet
 from .serializers import CertificateSerializer
 
@@ -8,4 +8,4 @@ class CertificateViewSet(NetBoxModelViewSet):
         'tags'
     )
     serializer_class = CertificateSerializer
-    # filterset_class = CertificateFilterSet
+    filterset_class = CertificateFilterSet
