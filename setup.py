@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 setup(
     name='netbox-certificate',
     version='1.0.2',
-    description='ADESTIS Applications',
+    description='ADESTIS Certificate Management',
     # url='https://github.com/adestis/netbox-account-management',
     author='ADESTIS GmbH',
     author_email='pypi@adestis.de',

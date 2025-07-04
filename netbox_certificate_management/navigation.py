@@ -17,7 +17,7 @@ plugin_settings = settings.PLUGINS_CONFIG.get('netbox_certificate_management', {
 
 if plugin_settings.get('top_level_menu'):
     menu = PluginMenu(  
-        label="Certificate",
+        label="Certificate Management",
         groups=(
             ("Certificate", _certificate),
         ),

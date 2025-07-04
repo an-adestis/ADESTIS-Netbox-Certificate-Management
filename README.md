@@ -1,38 +1,46 @@
-# Netbox Application Plugin
+# NetBox Certificate Plugin
 
-Netbox Plugin for Application related objects documentation.
-## Features
+The **NetBox Certificate Plugin** extends NetBox with the ability to manage certificates and link them to various existing NetBox objects.
 
-This plugin provide following Model:
-* Applications
+In addition to manually creating certificates, the plugin supports importing entire certificate bundles (e.g., PEM files). During the import process, certificates are automatically parsed, relevant data is extracted, and associations with appropriate NetBox objects are created automatically.
 
-## Compatibility
+The plugin also provides a clean and structured UI to display all key certificate details and allows flexible associations with various NetBox objects such as systems, clusters, tenants, and more.
 
-|               |           |
-|---------------|-----------|
-| NetBox 3.4.x  | >= 0.9.0  |
+---
 
+## 🚀 Features
 
-## Installation
+- Manage certificates directly within NetBox
+- Import entire certificate bundles with automatic processing
+- Automatic extraction of key certificate information (e.g. subject, issuer, validity, key technology, etc.)
+- Flexible association of certificates with existing NetBox objects
+- Clean and structured UI integration
 
-The plugin is available as a Python package in pypi and can be installed with pip  
-
-```
-pip install netbox_certificate_management
-```
-Enable the plugin in /etc/netbox/config/configuration.py:
-```
-PLUGINS = ['netbox_certificate_management']
-```
-Restart NetBox and add `netbox_certificate_management` to your local_requirements.txt
-
-See [NetBox Documentation](https://docs.netbox.dev/en/stable/plugins/#installing-plugins) for details
-
-
+---
 ## Screenshots
 
-Applications
-![Add](./docs/Images/image.png)
+![Certificates Details](./certificate/img01.png)
+![Certificates View](./certificate/img02.png)
 
-Applications
-![Results](./docs/Images/image-1.png)
+## ⚙️ Installation
+
+The plugin is available on PyPI and can be installed via pip:
+
+```bash
+pip install adestis_netbox_certificate_management
+```
+
+## ✅ Compatibility
+
+> **Note**: This plugin depends on the [`adestis-netbox-applications`](https://pypi.org/project/adestis-netbox-applications/) plugin.  
+> Therefore, its compatibility is directly tied to the NetBox version used in the base image.
+
+The plugin is developed and tested using the following base image:
+
+```dockerfile
+ARG FROM_TAG=v4.2.9-3.2.1  # NetBox v4.2.9
+```
+
+
+
+

@@ -18,15 +18,11 @@ class CertificateMetadataExtractorJob(JobRunner):
         model = Certificate 
         
     def run(self, *args, **kwargs):
-        logger = logging.getLogger('CertificateMetadataExtractorJob')
+        # logger = logging.getLogger('CertificateMetadataExtractorJob')
         
-        logger.warning("Starting to import certificates")
         
         for certificate in Certificate.objects.all():
                 x509cert = x509.load_pem_x509_certificate(certificate.certificate.encode('utf-8'), default_backend())
-                # logger.warning(f"type(certificate): {type(certificate)}")
-                # logger.warning(f"type(certificate.certificate): {type(certificate.certificate)}")
-                # logger.warning(f"certificate.certificate: {certificate.certificate}")
                         
                 subject_key_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER)
                 subject_hex = subject_key_identifier.value.digest.hex()
@@ -56,6 +52,3 @@ class CertificateMetadataExtractorJob(JobRunner):
 
                 
                 certificate.save(update_fields=["subject_key_identifier", "authority_key_identifier", "valid_from", "valid_to", "subject", "issuer", "subject_alternative_name", "key_technology"])
-
-                # logger.warning(subject_hex)
-                # logger.warning(authority_hex)
