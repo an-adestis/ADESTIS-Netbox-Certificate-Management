@@ -75,12 +75,15 @@ class CertificateTable(NetBoxTable):
         linkify=True
     )
     
+    issuer = columns.MarkdownColumn(
+    )
+    
     authority_key_identifier = tables.Column(
         linkify=True
     )
 
     class Meta(NetBoxTable.Meta):
         model = Certificate
-        fields = ['name', 'status',   'description', 'tags',  'comments', 'valid_from', 'valid_to', 'contact_group', 'authority_key_identifier', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'tenant', 'installedapplication', 'tenant_group', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'contact', 'successor_certificates', 'predecessor_certificate', 'certificate']
+        fields = ['name', 'status',   'description', 'tags',  'comments', 'valid_from', 'valid_to', 'contact_group', 'issuer', 'authority_key_identifier', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'tenant', 'installedapplication', 'tenant_group', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'contact', 'successor_certificates', 'predecessor_certificate', 'certificate']
         default_columns = [ 'name', 'tenant', 'status', 'valid_from', 'valid_to', 'authority_key_identifier' ]
         

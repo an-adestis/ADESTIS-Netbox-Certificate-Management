@@ -105,15 +105,15 @@ class CertificateFilterSet(NetBoxModelFilterSet):
         label=_('Supplier')
     )
     
-    device = DynamicModelMultipleChoiceField(
-        queryset=Device.objects.all(),
-        required = False,
-        label=_('Device (ID)'),
-    )
+    # device = DynamicModelMultipleChoiceField(
+    #     queryset=Device.objects.all(),
+    #     required = False,
+    #     label=_('Device (ID)'),
+    # )
     
     tenant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        label=_('Tenant (ID)'),
+        label=_('Tenant (Name)'),
     )
     
     tenant = DynamicModelMultipleChoiceField(
@@ -130,7 +130,7 @@ class CertificateFilterSet(NetBoxModelFilterSet):
     
     tenant_group_id = django_filters.ModelMultipleChoiceFilter(
         queryset=TenantGroup.objects.all(),
-        label=_('Tenant (ID)'),
+        label=_('Tenant Group (ID)'),
     )
     
     tenant_group = DynamicModelMultipleChoiceField(

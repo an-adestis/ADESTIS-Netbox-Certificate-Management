@@ -35,6 +35,8 @@ urlpatterns = (
          name='certificateclustergroups_list'),
     path('certificates/virtualmachines/', VirtualMachineAffectedCertificateView.as_view(),
          name='certificatevirtualmachines_list'),
+    path('certificates/contacts/', ContactAffectedCertificateView.as_view(),
+         name='certificatecontacts_list'),
     path('certificates/devices/', CertificateAffectedDeviceView.as_view(),
          name='certificatedevices_list'),
     path('certificates/clusters/', CertificateAffectedClusterView.as_view(),

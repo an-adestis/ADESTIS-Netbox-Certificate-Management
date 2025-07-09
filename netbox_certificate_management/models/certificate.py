@@ -230,4 +230,10 @@ class Certificate(NetBoxModel):
     def sync(self):
         from netbox_certificate_management.jobs import CertificateMetadataExtractorJob
         CertificateMetadataExtractorJob.enqueue()
+        
+    # def save(self, *args, **kwargs):
+    #     from netbox_certificate_management.jobs import CertificateMetadataExtractorJob
+    #     CertificateMetadataExtractorJob.enqueue_once(interval=JobIntervalChoices.INTERVAL_MINUTELY)
+    #     return super().save(*args, **kwargs)
+
  

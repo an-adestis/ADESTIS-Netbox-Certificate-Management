@@ -108,7 +108,7 @@
             <tr>
               <th scope='row'>Parent Certificate</th>
               <td>{% if object.authority_key_identifier %}
-                <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate' object.authority_key_identifier.id %}">
+                <a href="{% url 'plugins:netbox_certificate_management:certificate' object.authority_key_identifier.id %}">
                   {{ object.authority_key_identifier.subject_key_identifier | markdown }}
                   {% else %}
                 <span class="text-muted">{% trans "None" %}</span>

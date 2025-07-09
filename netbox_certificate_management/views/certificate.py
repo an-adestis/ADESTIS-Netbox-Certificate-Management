@@ -50,6 +50,7 @@ __all__ = (
     'ClusterAffectedCertificateView',
     'ClusterGroupAffectedCertificateView',
     'VirtualMachineAffectedCertificateView',
+    'ContactAffectedCertificateView',
     'CertificateAffectedVirtualMachineView',
     'CertificateAffectedDeviceView',
     'CertificateAffectedClusterView',
@@ -148,10 +149,15 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                             for name,value in [ (pair.split("=")) for pair in cert_data["subject"].split("\n") ]:
                                 if name == "CN":
                                     common_name=value
-                                    
+                            base_name = common_name
+                            i = 1
+                            unique_name = f"{base_name}#{i}"
+                            while Certificate.objects.filter(name=unique_name).exists():
+                                    i += 1
+                                    unique_name = f"{base_name}#{i}"        
                             cert = Certificate.objects.create(
                                 certificate=cleaned_cert,
-                                name=common_name,
+                                name=unique_name,
                                 subject_key_identifier=subject_key_identifier
                             )
                         created.append(cert) #The append() method appends an element to the end of the list.
@@ -976,7 +982,7 @@ class ContactAffectedCertificateView(generic.ObjectChildrenView):
         'export': {'view'},
         'bulk_import': {'add'},
         'bulk_edit': {'change'},
-        'bulk_remove_contact': {'change'},
+        'bulk_remove_certificate': {'change'},
     }
 
     tab = ViewTab(
@@ -995,7 +1001,7 @@ class CertificateAssignContact(generic.ObjectEditView):
     ).all()
     
     form = CertificateAssignContactForm
-    template_name = 'adestis_netbox_certificate_management/assign_contact.html'
+    template_name = 'netbox_certificate_management/assign_contact.html'
 
     def get(self, request, pk):
         certificate = get_object_or_404(self.queryset, pk=pk)

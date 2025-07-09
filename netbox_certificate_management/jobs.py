@@ -1,9 +1,12 @@
+import time
+
 from netbox_certificate_management.models import Certificate
 import logging
 
 from core.choices import JobIntervalChoices
 from netbox.jobs import JobRunner, system_job
 import cert_utils 
+
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -19,7 +22,7 @@ class CertificateMetadataExtractorJob(JobRunner):
         
     def run(self, *args, **kwargs):
         # logger = logging.getLogger('CertificateMetadataExtractorJob')
-        
+        time.sleep(2)
         
         for certificate in Certificate.objects.all():
                 x509cert = x509.load_pem_x509_certificate(certificate.certificate.encode('utf-8'), default_backend())
@@ -31,9 +34,9 @@ class CertificateMetadataExtractorJob(JobRunner):
                 authority_hex = authority_key_identifier.value.key_identifier.hex()
                 
                 certificate.subject_key_identifier = subject_hex
-                issuer_parent_certificate = Certificate.objects.filter(
-                subject_key_identifier=authority_hex
-                ).first()
+                # issuer_parent_certificate = Certificate.objects.filter(
+                # subject_key_identifier=authority_hex
+                # ).first()
                 
                 cert_data = cert_utils.parse_cert(certificate.certificate)
                 issuer = cert_data["issuer"].replace("\n", ";").strip()
@@ -44,11 +47,27 @@ class CertificateMetadataExtractorJob(JobRunner):
 
                 certificate.valid_from=cert_data["startdate"].date()
                 certificate.valid_to=cert_data["enddate"].date()
-                issuer=issuer
+                certificate.issuer=issuer
                 certificate.subject=common_name
-                certificate.authority_key_identifier = issuer_parent_certificate
+                # certificate.authority_key_identifier = issuer_parent_certificate
                 certificate.key_technology=cert_data["key_technology"]
                 certificate.subject_alternative_name=cert_data.get("SubjectAlternativeName", "")
 
                 
                 certificate.save(update_fields=["subject_key_identifier", "authority_key_identifier", "valid_from", "valid_to", "subject", "issuer", "subject_alternative_name", "key_technology"])
+
+        for certificate in Certificate.objects.all():
+            x509cert = x509.load_pem_x509_certificate(
+                certificate.certificate.encode("utf-8"), default_backend()
+            )
+
+            authority_hex = x509cert.extensions.get_extension_for_oid(
+                ExtensionOID.AUTHORITY_KEY_IDENTIFIER
+            ).value.key_identifier.hex()
+
+            issuer_parent_certificate = Certificate.objects.filter(
+                subject_key_identifier=authority_hex
+            ).first()
+
+            certificate.authority_key_identifier = issuer_parent_certificate
+            certificate.save(update_fields=["authority_key_identifier"])

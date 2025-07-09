@@ -38,7 +38,6 @@ __all__ = (
     'CertificateRemoveCluster',
     'CertificateRemoveClusterGroup',
     'CertificateRemoveVirtualMachine',
-    
 )
 
 class CertificateCRTForm(forms.Form):
