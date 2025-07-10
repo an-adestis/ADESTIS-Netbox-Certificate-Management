@@ -1,7 +1,7 @@
 from netbox.views import generic
 from netbox_certificate_management.forms import *
 from netbox_certificate_management.models import *
-from netbox_certificate_management.filtersets.certificate import CertificateFilterSet
+from netbox_certificate_management.filtersets import *
 from netbox_certificate_management.tables import *
 from netbox.views import generic
 from django.utils.translation import gettext as _
@@ -18,8 +18,8 @@ from django.urls import reverse
 from django.db import transaction
 from django.contrib import messages
 from utilities.views import GetRelatedModelsMixin, ViewTab, register_model_view
-from tenancy.models import Contact, ContactGroup
-from tenancy.tables import ContactTable, ContactGroupTable
+from tenancy.models import Contact, ContactGroup, Tenant
+from tenancy.tables import ContactTable, ContactGroupTable, TenantTable
 from dcim.models import *
 from dcim.forms import *
 from dcim.tables import *
@@ -68,6 +68,8 @@ __all__ = (
     'CertificateRemoveContactView',
     'CertificateRemoveClusterGroupView',
     'CertificateRemoveVirtualMachineView',
+    
+    'TenantAffectedCertificateView',
 )
 
 class CertificateView(generic.ObjectView):
@@ -139,7 +141,7 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                                 existing_cert = existing_cert.first()
                                 return redirect(existing_cert.get_absolute_url())
                             
-                            cert_data = cert_utils.parse_cert(cert_text)
+                            cert_data = cert_utils.parse_cert(single_cert)
                             
                             subject_key_identifier = cert_data.get("subject_key_identifier")
                             if not subject_key_identifier:
@@ -149,15 +151,10 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                             for name,value in [ (pair.split("=")) for pair in cert_data["subject"].split("\n") ]:
                                 if name == "CN":
                                     common_name=value
-                            base_name = common_name
-                            i = 1
-                            unique_name = f"{base_name}#{i}"
-                            while Certificate.objects.filter(name=unique_name).exists():
-                                    i += 1
-                                    unique_name = f"{base_name}#{i}"        
+                                    
                             cert = Certificate.objects.create(
                                 certificate=cleaned_cert,
-                                name=unique_name,
+                                name=common_name,
                                 subject_key_identifier=subject_key_identifier
                             )
                         created.append(cert) #The append() method appends an element to the end of the list.
@@ -214,7 +211,7 @@ class CertificateAffectedInstalledApplicationView(generic.ObjectChildrenView):
     )
 
     def get_children(self, request, parent):
-        return InstalledApplication.objects.restrict(request.user, 'view').filter(installedapplication=parent)
+        return InstalledApplication.objects.restrict(request.user, 'view').filter(certificate=parent)
     
 @register_model_view(Certificate, 'assign_application')
 class CertificateAssignApplication(generic.ObjectEditView):
@@ -1076,5 +1073,28 @@ class CertificateRemoveContactView(generic.ObjectEditView):
             'obj_type_plural': 'contacts',
             'return_url': certificate.get_absolute_url(),
         })
+        
+@register_model_view(Tenant, name='domains')
+class TenantAffectedCertificateView(generic.ObjectChildrenView):
+    queryset = Tenant.objects.all()
+    child_model= Certificate
+    table = CertificateTable
+    template_name = "netbox_certificate_management/certificate_tenant.html"
+    actions = {
+        'add': {'add'},
+        'export': {'view'},
+        'bulk_import': {'add'},
+        'bulk_edit': {'change'},
+        'bulk_remove_tenant': {'change'},
+    }
+
+    tab = ViewTab(
+        label=_('Certificates'),
+        badge=lambda obj: obj.certificate.count(),
+        hide_if_empty=False
+    )
+
+    def get_children(self, request, parent):
+        return Certificate.objects.restrict(request.user, 'view').filter(tenant=parent)
  
 

@@ -20,7 +20,8 @@ urlpatterns = (
          name='certificate_bulk_edit'),
     path('certificate/import/', CertificateBulkImportView.as_view(),
          name='certificate_bulk_import'),
-    path('certificates/import_certificate/', CertificateBulkImportCertificateView.as_view(), name='certificate_bulk_import_certificate'),
+    path('certificates/import_certificate/', CertificateBulkImportCertificateView.as_view(),
+         name='certificate_bulk_import_certificate'),
     path('certificates/successorcertificates/', CertificateAffectedSuccessorCertificateView.as_view(),
          name='successorcertificates_list'),
     path('certificates/prodecessorcertificates/', CertificateAffectedProdecessorCertificateView.as_view(),
@@ -61,5 +62,8 @@ urlpatterns = (
     path('certificate/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='certificate_changelog', kwargs={
         'model': Certificate
     }),
+    
+    path('certificates/tenants/', TenantAffectedCertificateView.as_view(),
+         name='certificatetenants_list'), 
 
 )

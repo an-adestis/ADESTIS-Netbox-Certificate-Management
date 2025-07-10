@@ -95,16 +95,15 @@
                   {% endif %}
               </td>
             </tr>
-            {% comment %} <tr>
-              <th scope='row'>Issuer (Parent Certificate)</th>
-              <td>{% if object.issuer_parent_certificate %}
-                <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate' object.issuer_parent_certificate.id %}">
-                  {{ object.issuer_parent_certificate.subject_key_identifier | markdown }}
+            <tr>
+              <th scope='row'>Issuer</th>
+              <td>{% if object.issuer %}
+                  {{ object.issuer | markdown }}
                   {% else %}
                 <span class="text-muted">{% trans "None" %}</span>
                   {% endif %}
               </td>
-            </tr> {% endcomment %}
+            </tr> 
             <tr>
               <th scope='row'>Parent Certificate</th>
               <td>{% if object.authority_key_identifier %}
@@ -134,25 +133,6 @@
               </td>
             </tr>
             <tr>
-              <th scope='row'>Tenant Group</th>
-              <td>
-                {% if object.tenant_group %}
-                  <a href="{% url 'tenancy:tenantgroup' object.tenant_group.id %}"> {{ object.tenant_group.name|markdown }} </a>
-                {% else %}
-                  <span class="text-muted">{% trans "None" %}</span>
-                {% endif %}
-              </td>
-            </tr>
-            <tr>
-              <th scope='row'>Tenant</th>
-              <td>{% if object.tenant %}
-                <a href="{% url 'tenancy:tenant' object.tenant.id %}"> {{ object.tenant.name|markdown }} </a>
-                  {% else %}
-                <span class="text-muted">{% trans "None" %}</span>
-                  {% endif %}
-              </td>
-            </tr>
-            <tr>
               <th scope='row'>Description</th>
               <td>{% if object.description %}
                 {{ object.description|markdown }}
@@ -169,6 +149,33 @@
       {% include 'inc/panels/custom_fields.html' %}
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
+    </div>
+    <div class="col col-md-6">  
+      <div class="card">
+        <h5 class="card-header">Tenant</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope='row'>Tenant Group</th>
+              <td>{% if object.tenant_group %}
+                <a href="{% url 'tenancy:tenantgroup' object.tenant_group.id %}"> {{ object.tenant_group.name|markdown }} </a>
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Tenant</th>
+              <td>{% if object.tenant %}
+                <a href="{% url 'tenancy:tenant' object.tenant.id %}"> {{ object.tenant.name|markdown }} </a>
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock content %}

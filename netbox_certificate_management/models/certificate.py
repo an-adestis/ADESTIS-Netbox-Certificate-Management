@@ -149,7 +149,7 @@ class Certificate(NetBoxModel):
     tenant = django_models.ForeignKey(
          to = 'tenancy.Tenant',
          on_delete = django_models.PROTECT,
-         related_name = 'certificate_tenant',
+         related_name = 'certificate',
          null = True,
          verbose_name='Tenant',
          blank = True
@@ -166,14 +166,13 @@ class Certificate(NetBoxModel):
     
     installedapplication = django_models.ManyToManyField(
         'adestis_netbox_applications.InstalledApplication',
-        related_name='installedapplication',
+        related_name='certificate',
         verbose_name='Applications',
         blank = True
     )
     
     contact = django_models.ManyToManyField(
         to = 'tenancy.Contact',
-        
         related_name='certificate',
         verbose_name='Contacts',
         blank = True
