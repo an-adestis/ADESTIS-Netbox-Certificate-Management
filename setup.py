@@ -7,7 +7,7 @@ setup(
     name='netbox-certificate',
     version='1.0.2',
     description='ADESTIS Certificate Management',
-    # url='https://github.com/adestis/netbox-account-management',
+    url = 'https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management',
     author='ADESTIS GmbH',
     author_email='pypi@adestis.de',
     install_requires=[],
