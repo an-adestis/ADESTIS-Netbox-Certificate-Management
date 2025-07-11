@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
     description = f.read()
 setup(
     name='adestis-netbox-certificate-management',
-    version='1.0.1',
+    version='1.0.4',
     description='ADESTIS Certificate Management',
     url = 'https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management',
     author='ADESTIS GmbH',
