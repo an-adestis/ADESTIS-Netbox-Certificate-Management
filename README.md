@@ -27,7 +27,7 @@ The plugin also provides a clean and structured UI to display all key certificat
 The plugin is available on PyPI and can be installed via pip:
 
 ```bash
-pip install netbox_certificate_management
+pip install adestis-netbox-certificate-management
 ```
 
 ## ✅ Compatibility
@@ -40,7 +40,3 @@ The plugin is developed and tested using the following base image:
 ```dockerfile
 ARG FROM_TAG=v4.2.9-3.2.1  # NetBox v4.2.9
 ```
-
-
-
-

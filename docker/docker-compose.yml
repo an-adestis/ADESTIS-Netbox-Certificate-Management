@@ -22,7 +22,7 @@ services:
     - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
   netbox-worker:
     # <<: *netbox
-    image: netbox-certificate-management-plugin:latest
+    image: adestis-netbox-certificate-management-plugin:latest
     build:
       context: ../
       dockerfile: Dev-Dockerfile

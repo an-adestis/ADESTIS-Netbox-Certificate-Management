@@ -9,7 +9,7 @@ from virtualization.api.serializers import *
 
 class CertificateSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox-certificate-management-api:certificate-detail'
+        view_name='plugins-api:adestis-netbox-certificate-management-api:certificate-detail'
     )
 
     class Meta:

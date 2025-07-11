@@ -4,7 +4,7 @@ from pathlib import Path
 with open("README.md", "r") as f:
     description = f.read()
 setup(
-    name='netbox-certificate',
+    name='adestis-netbox-certificate-management',
     version='1.0.1',
     description='ADESTIS Certificate Management',
     url = 'https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management',
@@ -16,7 +16,7 @@ setup(
     license='GPL-3.0-only',
     keywords=['netbox', 'netbox-plugin', 'plugin'],
     package_data={
-        "netbox-certificate-management": ["**/*.html"],
+        "adestis-netbox-certificate-management": ["**/*.html"],
         '': ['LICENSE'],
     },
     long_description=description,

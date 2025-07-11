@@ -1,7 +1,7 @@
 name: "local_docker_netbox_account_management_plugin"
 services:
   netbox: &netbox
-    image: netbox-certificate-management-plugin:latest
+    image: adestis-netbox-certificate-management-plugin:latest
     user: root
     build:
       context: ../
