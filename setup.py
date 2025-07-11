@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
     description = f.read()
 setup(
     name='netbox-certificate',
-    version='1.0.2',
+    version='1.0.1',
     description='ADESTIS Certificate Management',
     url = 'https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management',
     author='ADESTIS GmbH',
@@ -13,7 +13,7 @@ setup(
     install_requires=[],
     packages=find_packages(),
     include_package_data=True,
-    license='MIT License',
+    license='GPL-3.0-only',
     keywords=['netbox', 'netbox-plugin', 'plugin'],
     package_data={
         "netbox-certificate-management": ["**/*.html"],
