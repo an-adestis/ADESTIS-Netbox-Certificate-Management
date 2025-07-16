@@ -19,15 +19,15 @@ The plugin also provides a clean and structured UI to display all key certificat
 ---
 ## Screenshots
 
-![Certificates Details](./certificate/img01.png)
-![Certificates View](./certificate/img02.png)
+![Certificates Details](https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/blob/initialize_app/img01.png)
+![Certificates View](https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/blob/initialize_app/img02.png)
 
 ## ⚙️ Installation
 
 The plugin is available on PyPI and can be installed via pip:
 
 ```bash
-pip install adestis_netbox_certificate_management
+pip install adestis-netbox-certificate-management
 ```
 
 ## ✅ Compatibility
