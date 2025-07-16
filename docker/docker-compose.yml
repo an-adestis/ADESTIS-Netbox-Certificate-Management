@@ -1,4 +1,4 @@
-name: "local_docker_netbox_certificate_management_plugin"
+name: "local_docker_adestis_netbox_certificate_management_plugin"
 services:
   netbox: &netbox
     image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
@@ -47,7 +47,7 @@ services:
     - netbox-media-files:/opt/netbox/netbox/media:rw
     - netbox-reports-files:/opt/netbox/netbox/reports:rw
     - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
-    - ../netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/netbox_certificate_management/migrations
+    - ../adestis_netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/adestis_netbox_certificate_management/migrations
 
   # netbox-housekeeping:
   #   <<: *netbox
@@ -104,7 +104,7 @@ volumes:
     driver_opts:
         type: "none"
         o: "bind"
-        device: "../../data/local_netbox_certificate_management_plugin/postgres"
+        device: "../../data/local_adestis_netbox_certificate_management_plugin/postgres"
   netbox-redis-cache-data:
     driver: local
   netbox-redis-data:

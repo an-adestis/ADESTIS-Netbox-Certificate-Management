@@ -45,7 +45,7 @@ Stop the application container. Then add PLUGINS parameter and PLUGINS_CONFIG pa
 stored in netbox-docker/configuration/ by default:
 
 ```python
-PLUGINS = ['netbox_certificate_management']
+PLUGINS = ['adestis_netbox_certificate_management']
 ```
 
 After that you can start the application again and check the swagger file on `http://localhost:13000/api/schema/swagger-ui/` or access the graphql api on `http://localhost:13000/graphql/` !
@@ -58,7 +58,7 @@ Remove the MAX_PATH limitation (see https://docs.python.org/3/using/windows.html
 
 ### How to create a migration
 
-Mount the migrations folder, start the infrastructure services and run `docker-compose run netbox sh -c "python manage.py makemigrations netbox_certificate_management"`. After that unmount the migrations folder and rebuild the docker container
+Mount the migrations folder, start the infrastructure services and run `docker-compose run netbox sh -c "python manage.py makemigrations adestis_netbox_certificate_management"`. After that unmount the migrations folder and rebuild the docker container
 
 ## FAQ
 

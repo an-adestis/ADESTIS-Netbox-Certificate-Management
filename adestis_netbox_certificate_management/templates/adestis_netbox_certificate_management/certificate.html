@@ -1,0 +1,171 @@
+{% extends 'generic/object.html' %}
+{% load buttons %}
+{% load static %}
+{% load helpers %}
+{% load plugins %}
+{% load i18n %}
+{% block extra_controls %}
+{% endblock %}
+{% load render_table from django_tables2 %}
+{% block content %}
+  <div class="row my-3">
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Certificate</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Status</th>
+              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+            </tr>
+            <tr>
+              <th scope='row'>Name</th>
+              <td>{% if object.name %}
+                {{ object.name|markdown }}
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Common Name</th>
+              <td>
+                {% if object.subject %}
+                  {{ object.subject|markdown }}
+                {% else %}
+                  <span class="text-muted">{% trans "None" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Subject Alternative Names</th>
+              <td>
+                {% if object.subject_alternative_name %}
+                  {{ object.subject_alternative_name|markdown }}
+                {% else %}
+                  <span class="text-muted">{% trans "None" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Valid From</th>
+              <td>
+                {% if object.valid_from %}
+                  {{ object.valid_from|date:"Y-m-d" }}  <!-- Datum im Format YYYY-MM-DD anzeigen -->
+                {% else %}
+                  <span class="text-muted">{% trans "None" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Valid To</th>
+              <td>
+                {% if object.valid_to %}
+                  {{ object.valid_to|date:"Y-m-d" }}  <!-- Datum im Format YYYY-MM-DD anzeigen -->
+                {% else %}
+                  <span class="text-muted">{% trans "None" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Certificate</th>
+              <td>{% if object.certificate %}
+                {{ object.certificate|markdown }}
+                  {% else %}
+                      <span class="text-muted">{% trans "None" %}</span>  <!-- Wenn kein Zertifikat vorhanden ist -->
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Supplier</th>
+              <td>{% if object.contact_group %}
+                <a href="{% url 'tenancy:contactgroup' object.contact_group.id %}"> {{ object.contact_group.name|markdown }} </a>
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Issuer</th>
+              <td>{% if object.issuer %}
+                  {{ object.issuer | markdown }}
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr> 
+            <tr>
+              <th scope='row'>Parent Certificate</th>
+              <td>{% if object.authority_key_identifier %}
+                <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate' object.authority_key_identifier.id %}">
+                  {{ object.authority_key_identifier.subject_key_identifier | markdown }}
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr> 
+            <tr>
+              <th scope='row'>Subject Key Identifier</th>
+              <td>{% if object.subject_key_identifier %}
+                  {{ object.subject_key_identifier | markdown }}
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Key Technology</th>
+              <td>{% if object.key_technology %}
+                {{ object.key_technology|markdown }}
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Description</th>
+              <td>{% if object.description %}
+                {{ object.description|markdown }}
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-6">
+      {% include 'inc/panels/custom_fields.html' %}
+      {% include 'inc/panels/tags.html' %}
+      {% include 'inc/panels/comments.html' %}
+    </div>
+    <div class="col col-md-6">  
+      <div class="card">
+        <h5 class="card-header">Tenant</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope='row'>Tenant Group</th>
+              <td>{% if object.tenant_group %}
+                <a href="{% url 'tenancy:tenantgroup' object.tenant_group.id %}"> {{ object.tenant_group.name|markdown }} </a>
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope='row'>Tenant</th>
+              <td>{% if object.tenant %}
+                <a href="{% url 'tenancy:tenant' object.tenant.id %}"> {{ object.tenant.name|markdown }} </a>
+                  {% else %}
+                <span class="text-muted">{% trans "None" %}</span>
+                  {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

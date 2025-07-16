@@ -6,7 +6,7 @@ FROM ${FROM}
 ENV VIRTUAL_ENV=/opt/netbox/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY ./netbox_certificate_management /source/adestis-netbox-certificate/netbox_certificate_management/
+COPY ./adestis_netbox_certificate_management /source/adestis-netbox-certificate/adestis_netbox_certificate_management/
 COPY ./setup.py /source/adestis-netbox-certificate/
 COPY ./MANIFEST.in /source/adestis-netbox-certificate/
 COPY ./README.md /source/adestis-netbox-certificate/

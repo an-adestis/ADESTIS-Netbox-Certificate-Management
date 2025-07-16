@@ -27,7 +27,7 @@ The plugin also provides a clean and structured UI to display all key certificat
 The plugin is available on PyPI and can be installed via pip:
 
 ```bash
-pip install adestis-netbox-certificate-management
+pip install adestis_netbox_certificate_management
 ```
 
 ## ✅ Compatibility

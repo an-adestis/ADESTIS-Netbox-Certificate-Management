@@ -1,0 +1,34 @@
+{% extends 'generic/object_children.html' %}
+{% load helpers %}
+{% load i18n %}
+{% load buttons %}
+{% load plugins %}
+{% load static %}
+
+{% block extra_controls %}
+  <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate_assign_cluster' pk=object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-primary">
+    <span class="mdi mdi-plus-thick" aria-hidden="true"></span> Assign Cluster
+  </a>
+{% endblock %}
+
+{% block bulk_edit_controls %}
+    {{ block.super }}
+    {% if 'bulk_rename' in actions %}
+        <button type="submit" name="_rename"
+                {% formaction %}="{% url 'virtualization:cluster_bulk_rename' %}?return_url={{ return_url }}"
+                class="btn btn-outline-warning">
+            <i class="mdi mdi-pencil-outline" aria-hidden="true"></i> {% trans "Rename" %}
+        </button>
+    {% endif %}
+{% endblock bulk_edit_controls %}
+
+{% block bulk_delete_controls %}
+    {{ block.super }}
+    {% if 'bulk_remove_cluster' in actions %}
+        <button type="submit" name="_remove"
+                {% formaction %}="{% url 'plugins:adestis_netbox_certificate_management:certificate_remove_cluster' pk=object.pk %}?return_url={{ return_url }}"
+                class="btn btn-danger">
+            <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Remove Selected
+        </button>
+    {% endif %}
+{% endblock bulk_delete_controls %}
