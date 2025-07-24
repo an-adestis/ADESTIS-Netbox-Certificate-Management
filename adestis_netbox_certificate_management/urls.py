@@ -23,8 +23,6 @@ urlpatterns = (
          name='certificate_bulk_import_certificate'),
     path('certificates/successorcertificates/', CertificateAffectedSuccessorCertificateView.as_view(),
          name='successorcertificates_list'),
-    path('certificates/prodecessorcertificates/', CertificateAffectedProdecessorCertificateView.as_view(),
-         name='prodecessorcertificates_list'), 
     path('certificates/applications/', CertificateAffectedInstalledApplicationView.as_view(),
          name='certificateapplications_list'),
     path('certificates/devices/', DeviceAffectedCertificateView.as_view(),

@@ -44,8 +44,6 @@ __all__ = (
     'CertificateRemoveApplicationView',
     'CertificateAffectedSuccessorCertificateView',
     'CertificateRemoveSuccessorView',
-    'CertificateRemovePredecessorView',
-    'CertificateAffectedProdecessorCertificateView',
     'DeviceAffectedCertificateView',
     'ClusterAffectedCertificateView',
     'ClusterGroupAffectedCertificateView',
@@ -68,7 +66,6 @@ __all__ = (
     'CertificateRemoveContactView',
     'CertificateRemoveClusterGroupView',
     'CertificateRemoveVirtualMachineView',
-    
     'TenantAffectedCertificateView',
 )
 
@@ -312,8 +309,8 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
 
     tab = ViewTab(
         label=_('Successor Certificates'),
-        badge=lambda obj: obj.successor_certificates.count(),
-        hide_if_empty=True,
+        badge=lambda obj: obj.successor_certificate.count(),
+        hide_if_empty=False,
         weight=600
     )
     
@@ -357,70 +354,6 @@ class CertificateRemoveSuccessorView(generic.ObjectEditView):
             'parent_obj': certificate,
             'table': successor_table,
             'obj_type_plural': 'successor certificates',
-            'return_url': certificate.get_absolute_url(),
-        }) 
-        
-@register_model_view(Certificate, name='predecessor_certificates')
-class CertificateAffectedProdecessorCertificateView(generic.ObjectChildrenView):
-    queryset = Certificate.objects.all()
-    child_model= Certificate
-    table = CertificateTable
-    template_name = "adestis_netbox_certificate_management/predecessor_certificate.html"
-    actions = {
-        'add': {'add'},
-        'export': {'view'},
-        'bulk_import': {'add'},
-        'bulk_edit': {'change'},
-        'bulk_remove_predecessor_certificate': {'change'},
-    }
-
-    tab = ViewTab(
-        label=_('Predecessor Certificates'),
-        badge=lambda obj: obj.predecessor_certificate.count(),
-        hide_if_empty=True,
-        weight=600
-    )
-    
-    def get_children(self, request, parent):
-        return Certificate.objects.restrict(request.user, 'view').filter(predecessor_certificate=parent)
-        
-@register_model_view(Certificate, 'remove_predecessor_certificate', path='predecessorcertificate/remove')
-class CertificateRemovePredecessorView(generic.ObjectEditView):
-    queryset = Certificate.objects.all()
-    form = CertificateRemovePredecessor
-    template_name = 'generic/bulk_remove.html'
-
-    def post(self, request, pk):
-
-        certificate = get_object_or_404(self.queryset, pk=pk)
-
-        if '_confirm' in request.POST:
-            
-            form = self.form(request.POST)
-            if form.is_valid():
-                
-                predecessor_pks = form.cleaned_data['pk']
-                with transaction.atomic():
-                    certificate.predecessor_certificate.remove(*predecessor_pks)
-                    certificate.save()
-
-                messages.success(request, _("Removed {count} predecessor certificates from certificate {certificate}").format(
-                    count=len(predecessor_pks),
-                    certificate=certificate
-                ))
-                return redirect(certificate.get_absolute_url())
-        else:
-            form = self.form(initial={'pk': request.POST.getlist('pk')})
-
-        selected_objects = Certificate.objects.filter(pk__in=form.initial['pk'])
-        predecessor_table = CertificateTable(list(selected_objects), orderable=False)
-        predecessor_table.configure(request)
-
-        return render(request, self.template_name, {
-            'form': form,
-            'parent_obj': certificate,
-            'table': predecessor_table,
-            'obj_type_plural': 'predecessor certificates',
             'return_url': certificate.get_absolute_url(),
         }) 
         

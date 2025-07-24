@@ -67,6 +67,8 @@ class CertificateForm(NetBoxModelForm):
 
     comments = CommentField()
     
+    certificate = forms.Textarea()
+    
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),
         required=False,
@@ -134,7 +136,7 @@ class CertificateForm(NetBoxModelForm):
     
     fieldsets = (
         FieldSet('name', 'description', 'status', 'tags', name=_('Certificate')),
-        FieldSet('certificate', 'predecessor_certificate', 'successor_certificates', 'issuer_parent_certificate', 'subject', 'supplier_product', 'subject_alternative_name', 'key_technology', name=_('Certificate Chain')),
+        FieldSet('certificate', 'successor_certificates', 'issuer_parent_certificate', 'subject', 'supplier_product', 'subject_alternative_name', 'key_technology', name=_('Certificate Chain')),
         FieldSet('tenant_group', 'tenant',  name=_('Tenant')), 
         FieldSet('cluster_group', 'cluster', 'virtual_machine', name=_('Virtualization')),   
         FieldSet('device', name=_('Device')),
@@ -144,7 +146,7 @@ class CertificateForm(NetBoxModelForm):
 
     class Meta:
         model = Certificate
-        fields = ['name', 'description', 'status',  'tenant', 'tenant_group', 'cluster', 'installedapplication', 'cluster_group', 'virtual_machine', 'supplier_product', 'device', 'contact', 'comments', 'tags', 'contact_group', 'certificate', 'predecessor_certificate', 'successor_certificates', 'contact']
+        fields = ['name', 'description', 'status',  'tenant', 'tenant_group', 'cluster', 'installedapplication', 'cluster_group', 'virtual_machine', 'supplier_product', 'device', 'contact', 'comments', 'tags', 'contact_group', 'certificate', 'successor_certificates', 'contact']
         help_texts = {
             'status': "Example text"
         }
@@ -198,10 +200,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
         label = ("Supplier")
     )
      
-    certificate = forms.CharField(
-        help_text="The certificate to be linked to the certificate chain",
-        required=False
-    )
+    certificate = forms.Textarea()
     
     virtual_machine = DynamicModelMultipleChoiceField(
         queryset=VirtualMachine.objects.all(),
@@ -270,7 +269,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
 
     fieldsets = (
         FieldSet('name', 'description', 'status', 'tags', name=_('Certificate')),
-        FieldSet('certificate', 'predecessor_certificate', 'successor_certificates', 'supplier_product', name=_('Certificate Chain')),
+        FieldSet('certificate', 'successor_certificates', 'supplier_product', name=_('Certificate Chain')),
         FieldSet('valid_from', 'valid_to', name=_('Validity')),
         FieldSet('tenant_group', 'tenant',   name=_('Tenant')),
         FieldSet('cluster_group', 'cluster', 'virtual_machine', name=_('Virtualization')),
@@ -299,7 +298,7 @@ class CertificateFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet('q', 'index'),
         FieldSet('name', 'description', 'status', 'tags', name=_('Certificate')),
-        FieldSet('certificate_id', 'predecessor_certificate', 'successor_certificates', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'supplier_product',  name=_('Certificate Chain')),
+        FieldSet('certificate_id', 'successor_certificates', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'supplier_product',  name=_('Certificate Chain')),
         FieldSet('valid_from', 'valid_to', name=_('Validity')),
         FieldSet('tenant_group_id', 'tenant_id',  name=_('Tenant')),
         FieldSet('cluster_group', 'cluster', 'virtual_machine', name=_('Virtualization')),
@@ -357,12 +356,6 @@ class CertificateFilterForm(NetBoxModelFilterSetForm):
         queryset=Certificate.objects.all(),
         required=False,
         label=_('Successor Certificate')
-    )
-    
-    predecessor_certificate = DynamicModelMultipleChoiceField(
-        queryset=Certificate.objects.all(),
-        required=False,
-        label=_('Predecessor Certificate')
     )
     
     virtual_machine = DynamicModelMultipleChoiceField(
@@ -487,14 +480,6 @@ class CertificateCSVForm(NetBoxModelImportForm):
         help_text=_('Assigned virtual machine')
     )
     
-    predecessor_certificate = CSVModelMultipleChoiceField(
-        label=_('Predecessor Certificate'),
-        queryset=Certificate.objects.all(),
-        required=True,
-        to_field_name='name',
-        help_text=_('Assigned predecessor certificate')
-    )
-    
     successor_certificate = CSVModelMultipleChoiceField(
         label=_('Successor Certificate'),
         queryset=Certificate.objects.all(),
@@ -529,7 +514,7 @@ class CertificateCSVForm(NetBoxModelImportForm):
 
     class Meta:
         model = Certificate
-        fields = ['name' ,'status', 'valid_from', 'valid_to', 'contact_group', 'supplier_product', 'subject', 'subject_alternative_name', 'key_technology', 'predecessor_certificate', 'successor_certificate', 'device', 'virtual_machine', 'cluster', 'cluster_group', 'contact', 'issuer', 'installedapplication', 'comments', 'description', 'certificate', 'tags']
+        fields = ['name' ,'status', 'valid_from', 'valid_to', 'contact_group', 'supplier_product', 'subject', 'subject_alternative_name', 'key_technology', 'successor_certificate', 'device', 'virtual_machine', 'cluster', 'cluster_group', 'contact', 'issuer', 'installedapplication', 'comments', 'description', 'certificate', 'tags']
         default_return_url = 'plugins:adestis_netbox_certificate_management:Certificate_list'
         
 class CertificateAssignDeviceForm(forms.Form):

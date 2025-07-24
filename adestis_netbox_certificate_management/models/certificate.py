@@ -125,11 +125,9 @@ class Certificate(NetBoxModel):
         null = True,
     )
     
-    certificate = django_models.CharField(
+    certificate = django_models.TextField(
         verbose_name='Certificate',
         help_text='The certificate to be linked to the certificate chain',
-        unique=True,
-        max_length=10000,
     )
     
     virtual_machine = django_models.ManyToManyField(
@@ -194,18 +192,12 @@ class Certificate(NetBoxModel):
         blank = True
     )
     
-    predecessor_certificate = django_models.ManyToManyField(
+    successor_certificates = django_models.ForeignKey(
         'self',
-        related_name = 'certificate',
-        verbose_name='Predecessor Certificate',
-        blank=True
-    )
-    
-    successor_certificates = django_models.ManyToManyField(
-        'self',
-        related_name = 'certificate',
         verbose_name='Successor Certificate',
-        blank=True
+        on_delete = django_models.CASCADE,
+        null=True,
+        related_name='successor_certificate'
     )
     
     class Meta:

@@ -19,8 +19,9 @@ The plugin also provides a clean and structured UI to display all key certificat
 ---
 ## Screenshots
 
-![Certificates Details](https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/blob/initialize_app/img01.png)
-![Certificates View](https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/blob/initialize_app/img02.png)
+![Certificates Details](https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/raw/initialize_app/img01.png)
+
+![Certificates View](https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/raw/initialize_app/img02.png)
 
 ## ⚙️ Installation
 

@@ -53,11 +53,6 @@ class CertificateFilterSet(NetBoxModelFilterSet):
         queryset=Certificate.objects.all()
     )
     
-    predecessor_certificate = django_filters.ModelMultipleChoiceFilter(
-        field_name='predecessor_certificate',
-        queryset=Certificate.objects.all()
-    )
-    
     successor_certificates = django_filters.ModelMultipleChoiceFilter(
         field_name='successor_certificates',
         queryset=Certificate.objects.all()
@@ -140,7 +135,7 @@ class CertificateFilterSet(NetBoxModelFilterSet):
     )
     class Meta:
         model = Certificate
-        fields = ['id', 'status', 'name', 'valid_from', 'valid_to', 'tenant', 'tenant_group', 'virtual_machine', 'device', 'cluster', 'cluster_group', 'installedapplication', 'subject', 'issuer_parent_certificate', 'successor_certificates', 'predecessor_certificate', 'key_technology', 'subject_alternative_name', 'contact', 'contact_group']
+        fields = ['id', 'status', 'name', 'valid_from', 'valid_to', 'tenant', 'tenant_group', 'virtual_machine', 'device', 'cluster', 'cluster_group', 'installedapplication', 'subject', 'issuer_parent_certificate', 'successor_certificates', 'key_technology', 'subject_alternative_name', 'contact', 'contact_group']
 
     def search(self, queryset, name, value):
         if not value.strip():

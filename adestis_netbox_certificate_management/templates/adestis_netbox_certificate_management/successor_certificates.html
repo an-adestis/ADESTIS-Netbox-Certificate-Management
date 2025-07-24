@@ -6,14 +6,14 @@
     {{ block.super }}
     {% if 'bulk_rename' in actions %}
         <button type="submit" name="_rename"
-                {% formaction %}="{% url 'adestis_netbox_certificate_management:successor_certificates' %}?return_url={{ return_url }}"
+                {% formaction %}="{% url 'adestis_netbox_certificate_management:successor_certificates' object.subject_key_identifier.id %}?return_url={{ return_url }}"
                 class="btn btn-outline-warning">
             <i class="mdi mdi-pencil-outline" aria-hidden="true"></i> {% trans "Rename" %}
         </button>
     {% endif %}
 {% endblock bulk_edit_controls %}
 
-{% block bulk_delete_controls %}
+{% comment %} {% block bulk_delete_controls %}
     {{ block.super }}
     {% if 'bulk_remove_successor_certificate' in actions %}
         <button type="submit" name="_remove"
@@ -22,4 +22,4 @@
             <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Remove Selected
         </button>
     {% endif %}
-{% endblock bulk_delete_controls %}
+{% endblock bulk_delete_controls %} {% endcomment %}
