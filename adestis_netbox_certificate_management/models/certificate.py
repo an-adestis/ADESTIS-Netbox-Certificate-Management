@@ -82,6 +82,13 @@ class Certificate(NetBoxModel):
         related_name='authority_certificates'
     )
     
+    authority_identifier = django_models.CharField(
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True
+    )
+    
     subject_key_identifier = django_models.CharField(
         max_length=40,
         unique=True,
@@ -197,6 +204,7 @@ class Certificate(NetBoxModel):
         verbose_name='Successor Certificate',
         on_delete = django_models.CASCADE,
         null=True,
+        blank=True,
         related_name='successor_certificate'
     )
     

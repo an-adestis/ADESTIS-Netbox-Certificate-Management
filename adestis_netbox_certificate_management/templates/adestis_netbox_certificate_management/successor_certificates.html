@@ -2,24 +2,29 @@
 {% load helpers %}
 {% load i18n %}
 
-{% block bulk_edit_controls %}
-    {{ block.super }}
-    {% if 'bulk_rename' in actions %}
-        <button type="submit" name="_rename"
-                {% formaction %}="{% url 'adestis_netbox_certificate_management:successor_certificates' object.subject_key_identifier.id %}?return_url={{ return_url }}"
-                class="btn btn-outline-warning">
-            <i class="mdi mdi-pencil-outline" aria-hidden="true"></i> {% trans "Rename" %}
-        </button>
-    {% endif %}
-{% endblock bulk_edit_controls %}
+<h4>{% trans "Successor Certificates" %}</h4>
+<table class="table table-hover panel-body">
+  <thead>
+    <tr>
+      <th>{% trans "Common Name" %}</th>
+      <th>{% trans "Valid From" %}</th>
+      <th>{% trans "Valid To" %}</th>
+      <th>{% trans "Subject Key Identifier" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for successor in object.successor_certificates.all %}
+      <tr>
+        <td><a href="{{ successor.get_absolute_url }}">{{ successor.subject }}</a></td>
+        <td>{{ successor.valid_from }}</td>
+        <td>{{ successor.valid_to }}</td>
+        <td>{{ successor.subject_key_identifier }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="4"><em>{% trans "No successor certificates found." %}</em></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-{% comment %} {% block bulk_delete_controls %}
-    {{ block.super }}
-    {% if 'bulk_remove_successor_certificate' in actions %}
-        <button type="submit" name="_remove"
-                {% formaction %}="{% url 'plugins:adestis_netbox_certificate_management:certificate_remove_successor_certificate' pk=object.pk %}?return_url={{ return_url }}"
-                class="btn btn-danger">
-            <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Remove Selected
-        </button>
-    {% endif %}
-{% endblock bulk_delete_controls %} {% endcomment %}

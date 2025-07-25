@@ -116,5 +116,7 @@ configuration/ldap/*
 !configuration/ldap/extra.py
 !configuration/ldap/ldap_config.py
 !configuration/logging.py
+!configuration/worker_logging.py
+!configuration/app_logging.py
 !configuration/plugins.py
 super-linter.log

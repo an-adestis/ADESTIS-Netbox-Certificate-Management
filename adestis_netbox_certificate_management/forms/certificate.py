@@ -55,7 +55,7 @@ class CertificateCRTForm(forms.Form):
     
     class Meta:
         model = Certificate
-        fields = ['name', 'valid_from', 'valid_to', 'contact_group',  'subject', 'subject_alternative_name','issuer_parent_certificate', 'key_technology',  'issuer', 'certificate', 'tags']
+        fields = ['name', 'status', 'valid_from', 'valid_to', 'contact_group',  'subject', 'subject_alternative_name','issuer_parent_certificate', 'key_technology',  'issuer', 'certificate', 'tags']
         default_return_url = 'plugins:adestis_netbox_certificate_management:certificate_list'
     
     def __init__(self, *args, **kwargs):

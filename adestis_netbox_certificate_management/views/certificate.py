@@ -152,7 +152,8 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                             cert = Certificate.objects.create(
                                 certificate=cleaned_cert,
                                 name=common_name,
-                                subject_key_identifier=subject_key_identifier
+                                subject_key_identifier=subject_key_identifier,
+                                status = CertificateStatusChoices.STATUS_ACTIVE
                             )
                         created.append(cert) #The append() method appends an element to the end of the list.
             if created:

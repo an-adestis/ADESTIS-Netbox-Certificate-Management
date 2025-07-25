@@ -15,7 +15,7 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509.oid import ExtensionOID
 from django.utils.translation import gettext_lazy as _
-
+import logging
 
 class CertificateMetadataExtractorJob(JobRunner):
     class Meta:
@@ -23,8 +23,8 @@ class CertificateMetadataExtractorJob(JobRunner):
         model = Certificate 
         
     def run(self, *args, **kwargs):
-        # logger = logging.getLogger('CertificateMetadataExtractorJob')
         time.sleep(2)
+
         
         created = []
         for certificate in Certificate.objects.all():
@@ -66,7 +66,6 @@ class CertificateMetadataExtractorJob(JobRunner):
                     if name == "CN":
                         extra_common_name=value
 
-                # Nur erstellen, wenn das Zertifikat nicht schon existiert
                 existing = Certificate.objects.filter(certificate=extra_cert).first()
                 if existing:
                     continue
@@ -83,9 +82,7 @@ class CertificateMetadataExtractorJob(JobRunner):
                         
                 subject_key_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER)
                 subject_hex = subject_key_identifier.value.digest.hex()
-                        
-                
-                
+    
                 certificate.subject_key_identifier = subject_hex
                 
                 cert_data = cert_utils.parse_cert(certificate.certificate)
@@ -108,18 +105,24 @@ class CertificateMetadataExtractorJob(JobRunner):
         for certificate in Certificate.objects.all():
             x509cert = x509.load_pem_x509_certificate(certificate.certificate.encode("utf-8"), default_backend())
 
-            authority_key_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_KEY_IDENTIFIER)
-            authority_hex = authority_key_identifier.value.key_identifier.hex()
+            authority_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_KEY_IDENTIFIER)
+            authority_hex = authority_identifier.value.key_identifier.hex()
 
+            subject_key_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER)
+            subject_hex = subject_key_identifier.value.digest.hex()
+    
+            certificate.subject_key_identifier = subject_hex
+            
+            certificate.authority_identifier = authority_hex
             issuer_parent_certificate = Certificate.objects.filter(
                 subject_key_identifier=authority_hex
             ).first()
             
             successor_certificates = Certificate.objects.filter(
-                authority_key_identifier=subject_hex
-            ).first()
-
-            certificate.subject_key_identifier = successor_certificates
+                authority_identifier=subject_hex
+            )
             
+
+            certificate.successor_certificate.set(successor_certificates)
             certificate.authority_key_identifier = issuer_parent_certificate
-            certificate.save(update_fields=["authority_key_identifier", "subject_key_identifier"])
+            certificate.save(update_fields=["authority_key_identifier", "subject_key_identifier", "successor_certificates", "authority_identifier"])
