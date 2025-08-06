@@ -55,7 +55,7 @@ __all__ = (
     'CertificateAffectedClusterGroupView',
     'CertificateAffectedContactView',
     'CertificateAffectedInstalledApplicationView',
-    'InstalledApplicationAffectedCertificateView',
+    
     'CertificateAssignDevice',
     'CertificateAssignCluster',
     'CertificateAssignClusterGroup',
@@ -164,29 +164,6 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
         }
         return render(request, self.template_name, context)        
         
-    
-@register_model_view(InstalledApplication, name='certificate')
-class InstalledApplicationAffectedCertificateView(generic.ObjectChildrenView):
-    queryset = InstalledApplication.objects.all()
-    child_model= Certificate
-    table = CertificateTable
-    template_name = "adestis_netbox_certificate_management/certificate_application.html"
-    actions = {
-        'add': {'add'},
-        'export': {'view'},
-        'bulk_import': {'add'},
-        'bulk_edit': {'change'},
-        'bulk_remove_certificate': {'change'},
-    }
-
-    tab = ViewTab(
-        label=_('Certificate'),
-        badge=lambda obj: obj.certificate.count(),
-        hide_if_empty=False
-    )
-
-    def get_children(self, request, parent):
-        return Certificate.objects.restrict(request.user, 'view').filter(installedapplication=parent)
     
 @register_model_view(Certificate, name='applications')
 class CertificateAffectedInstalledApplicationView(generic.ObjectChildrenView):

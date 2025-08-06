@@ -5,6 +5,7 @@ class AdestisCertificateManagementAppConfig(AppConfig):
 
     def ready(self):
         from adestis_netbox_certificate_management.jobs import CertificateMetadataExtractorJob
+        from adestis_netbox_certificate_management import views
 
         CertificateMetadataExtractorJob.schedule(
             name="certificate_metadata_extractor",
