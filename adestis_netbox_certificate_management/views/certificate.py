@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from adestis_netbox_certificate_management.models import *
 from adestis_netbox_certificate_management.tables import *
 from adestis_netbox_applications.models import InstalledApplication
-from adestis_netbox_applications.tables import InstalledApplicationTable
+from adestis_netbox_applications.tables import InstalledApplicationTable, InstalledApplicationTableTab
 from utilities.views import GetRelatedModelsMixin, ViewTab, register_model_view
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.exceptions import ValidationError
@@ -66,6 +66,7 @@ __all__ = (
     'CertificateRemoveContactView',
     'CertificateRemoveClusterGroupView',
     'CertificateRemoveVirtualMachineView',
+    'CertificateRemoveTenantView',
     'TenantAffectedCertificateView',
 )
 
@@ -169,7 +170,7 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
 class CertificateAffectedInstalledApplicationView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= InstalledApplication
-    table = InstalledApplicationTable
+    table = InstalledApplicationTableTab
     template_name = "adestis_netbox_certificate_management/application.html"
     actions = {
         'add': {'add'},
@@ -339,15 +340,8 @@ class CertificateRemoveSuccessorView(generic.ObjectEditView):
 class CertificateAffectedDeviceView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= Device
-    table = DeviceTable
+    table = DeviceTableCertificate
     template_name = "adestis_netbox_certificate_management/device.html"
-    actions = {
-        'add': {'add'},
-        'export': {'view'},
-        'bulk_import': {'add'},
-        'bulk_edit': {'change'},
-        'bulk_remove_device': {'change'},
-    }
 
     tab = ViewTab(
         label=_('Devices'),
@@ -468,15 +462,8 @@ class CertificateRemoveDeviceView(generic.ObjectEditView):
 class CertificateAffectedClusterView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= Cluster
-    table = ClusterTable
+    table = ClusterTableCertificate
     template_name = "adestis_netbox_certificate_management/cluster.html"
-    actions = {
-        'add': {'add'},
-        'export': {'view'},
-        'bulk_import': {'add'},
-        'bulk_edit': {'change'},
-        'bulk_remove_cluster': {'change'},
-    }
 
     tab = ViewTab(
         label=_('Clusters'),
@@ -602,16 +589,8 @@ class CertificateRemoveClusterView(generic.ObjectEditView):
 class CertificateAffectedClusterGroupView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= ClusterGroup
-    table = ClusterGroupTable
+    table = ClusterGroupTableCertificate
     template_name = "adestis_netbox_certificate_management/cluster_group.html"
-    actions = {
-        'add': {'add'},
-        'export': {'view'},
-        'bulk_import': {'add'},
-        'bulk_edit': {'change'},
-        'bulk_remove_cluster_group': {'change'},
-    }
-
     tab = ViewTab(
         label=_('Cluster Groups'),
         badge=lambda obj: obj.cluster_group.count(),
@@ -731,7 +710,7 @@ class CertificateRemoveClusterGroupView(generic.ObjectEditView):
 class CertificateAffectedVirtualMachineView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= VirtualMachine
-    table = VirtualMachineTable
+    table = VirtualMachineTableCertificate
     template_name = "adestis_netbox_certificate_management/virtual_machine.html"
     actions = {
         'add': {'add'},
@@ -860,7 +839,7 @@ class CertificateRemoveVirtualMachineView(generic.ObjectEditView):
 class CertificateAffectedContactView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= Contact
-    table = ContactTable
+    table = ContactTableCertificate
     template_name = "adestis_netbox_certificate_management/contact.html"
     actions = {
         'add': {'add'},
@@ -1009,3 +988,42 @@ class TenantAffectedCertificateView(generic.ObjectChildrenView):
         return Certificate.objects.restrict(request.user, 'view').filter(tenant=parent)
  
 
+@register_model_view(Certificate, 'remove_tenant', path='tenant/remove')
+class CertificateRemoveTenantView(generic.ObjectEditView):
+    queryset = Certificate.objects.all()
+    form = CertificateRemoveTenant
+    template_name = 'generic/bulk_remove.html'
+
+    def post(self, request, pk):
+
+        certificate = get_object_or_404(self.queryset, pk=pk)
+
+        if '_confirm' in request.POST:
+            
+            form = self.form(request.POST)
+            if form.is_valid():
+                
+                tenant_pks = form.cleaned_data['pk']
+                with transaction.atomic():
+                    certificate.tenant.remove(*tenant_pks)
+                    certificate.save()
+
+                messages.success(request, _("Removed {count} tenant from certificate {certificate}").format(
+                    count=len(tenant_pks),
+                    certificate=certificate
+                ))
+                return redirect(certificate.get_absolute_url())
+        else:
+            form = self.form(initial={'pk': request.POST.getlist('pk')})
+
+        selected_objects = Tenant.objects.filter(pk__in=form.initial['pk'])
+        tenant_table = TenantTable(list(selected_objects), orderable=False)
+        tenant_table.configure(request)
+
+        return render(request, self.template_name, {
+            'form': form,
+            'parent_obj': certificate,
+            'table': tenant_table,
+            'obj_type_plural': 'tenantss',
+            'return_url': certificate.get_absolute_url(),
+        })

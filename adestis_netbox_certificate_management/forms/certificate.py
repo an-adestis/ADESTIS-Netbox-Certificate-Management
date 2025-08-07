@@ -30,6 +30,8 @@ __all__ = (
     'CertificateAssignClusterGroupForm',
     'CertificateAssignVirtualMachineForm',
     'CertificateAssignContactForm',
+    
+    
     'CertificateRemoveApplication',
     'CertificateRemovePredecessor',
     'CertificateRemoveSuccessor',
@@ -38,6 +40,7 @@ __all__ = (
     'CertificateRemoveCluster',
     'CertificateRemoveClusterGroup',
     'CertificateRemoveVirtualMachine',
+    'CertificateRemoveTenant',
 )
 
 class CertificateCRTForm(forms.Form):
@@ -60,7 +63,6 @@ class CertificateCRTForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add the `multiple` attribute to allow selecting multiple files
         self.fields["certificate"].widget.attrs.update({"multiple": "true"})
 
 class CertificateForm(NetBoxModelForm):
@@ -732,4 +734,8 @@ class CertificateRemoveClusterGroup(ConfirmationForm):
     
 
 
-    
+class CertificateRemoveTenant(ConfirmationForm):
+    pk = forms.ModelMultipleChoiceField(
+        queryset=Tenant.objects.all(),
+        widget=forms.MultipleHiddenInput()
+    )
