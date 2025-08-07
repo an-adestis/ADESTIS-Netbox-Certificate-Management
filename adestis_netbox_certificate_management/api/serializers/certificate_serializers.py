@@ -14,8 +14,8 @@ class CertificateSerializer(NetBoxModelSerializer):
 
     class Meta:
         model = Certificate
-        fields = ('id', 'tags', 'custom_fields', 'display', 'url', 'created', 'last_updated',
-                  'custom_field_data', 'status', 'comments')
-        brief_fields = ('id', 'tags', 'custom_fields', 'display', 'url', 'created', 'last_updated',
-                        'custom_field_data', 'status', 'comments')
+        fields = ('id', 'tags', 'custom_fields', 'display', 'created', 'last_updated',
+                  'custom_field_data', 'status', 'comments', 'tenant', 'tenant_group', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'description')
+        brief_fields = ('id', 'tags', 'custom_fields', 'display', 'created', 'last_updated',
+                        'custom_field_data', 'status', 'comments', 'tenant', 'tenant_group', 'cluster', 'cluster_group', 'virtual_machine', 'device', 'description')
 

@@ -9,6 +9,7 @@
 #     # ['John Doe', 'jdoe@example.com'],
 # ]
 
+
 ## URL schemes that are allowed within links in NetBox
 # ALLOWED_URL_SCHEMES = (
 #     'file', 'ftp', 'ftps', 'http', 'https', 'irc', 'mailto', 'sftp', 'ssh', 'tel', 'telnet', 'tftp', 'vnc', 'xmpp',

@@ -1,0 +1,30 @@
+{% extends 'generic/object_children.html' %}
+{% load helpers %}
+{% load i18n %}
+
+<h4>{% trans "Successor Certificates" %}</h4>
+<table class="table table-hover panel-body">
+  <thead>
+    <tr>
+      <th>{% trans "Common Name" %}</th>
+      <th>{% trans "Valid From" %}</th>
+      <th>{% trans "Valid To" %}</th>
+      <th>{% trans "Subject Key Identifier" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for successor in object.successor_certificates.all %}
+      <tr>
+        <td><a href="{{ successor.get_absolute_url }}">{{ successor.subject }}</a></td>
+        <td>{{ successor.valid_from }}</td>
+        <td>{{ successor.valid_to }}</td>
+        <td>{{ successor.subject_key_identifier }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="4"><em>{% trans "No successor certificates found." %}</em></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+

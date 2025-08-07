@@ -4,6 +4,6 @@ from . import views
 app_name = 'adestis_netbox_certificate_management'
 
 router = NetBoxRouter()
-router.register('certificates', views.CertificateViewSet)
+router.register('certificate', views.CertificateViewSet)
 
 urlpatterns = router.urls

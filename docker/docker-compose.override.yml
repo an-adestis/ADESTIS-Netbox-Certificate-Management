@@ -1,11 +1,11 @@
-name: "local_docker_netbox_certificate_management_plugin"
+name: "local_docker_netbox_account_management_plugin"
 services:
   netbox: &netbox
     image: adestis-netbox-certificate-management-plugin:latest
+    user: root
     build:
       context: ../
       dockerfile: Dev-Dockerfile
-    user: root
     depends_on:
     - postgres
     - redis
@@ -20,10 +20,26 @@ services:
       DEVELOPER: "True"
       DEBUG: "True"
       DB_WAIT_DEBUG: "1"
-    # docker compose run netbox sh -c "python manage.py makemigrations adestis_netbox_certificate_management"
-    # volumes:
-    #   - ../adestis_netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/adestis_netbox_certificate_management/migrations
+      
+    # docker-compose run netbox sh -c "python manage.py makemigrations adestis_netbox_certificate_management"
+    # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/base_requirements.txt
+    # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/requirements-container.txt
+    # docker-compose run netbox sh -c "cat /opt/netbox/base_requirements.txt" > ../docs/requirements.txt
+    volumes:
+     - ./../adestis_netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/adestis_netbox_certificate_management/migrations:rw
   netbox-worker:
-    <<: *netbox
-  netbox-housekeeping:
-    <<: *netbox
+    image: adestis-netbox-plugin-account-management-plugin:latest
+    build:
+      context: ../
+      dockerfile: Dev-Dockerfile
+
+    environment:
+      SKIP_SUPERUSER: "false"
+      SUPERUSER_EMAIL: "admin@adestis.de"
+      SUPERUSER_NAME: "admin"
+      SUPERUSER_PASSWORD: "admin"
+      DEVELOPER: "True"
+      DEBUG: "True"
+      DB_WAIT_DEBUG: "1"
+  # netbox-housekeeping:
+  #   <<: *netbox

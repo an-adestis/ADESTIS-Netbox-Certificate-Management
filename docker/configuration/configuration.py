@@ -257,6 +257,9 @@ if 'PAGINATE_COUNT' in environ:
 # # Enable installed plugins. Add the name of each plugin to the list.
 PLUGINS = [
     "adestis_netbox_certificate_management",
+    # "adestis-netbox-plugin-account-management",
+    # "netbox-bgp",
+    # "netbox-data-flows"
 ]
 
 # # Plugins configuration settings. These settings are used by various plugins that the user may have installed.

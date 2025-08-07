@@ -1,0 +1,19 @@
+django-auth-ldap==5.1.0
+django-storages[azure,boto3,dropbox,google,libcloud,sftp]==1.14.4
+dulwich==0.22.7
+python3-saml==1.16.0
+adestis-netbox-applications==1.0.18
+# adestis-netbox-domain-management==1.0.5
+# adestis-netbox-certificate-management==1.0.13
+cert_utils
+josepy<3
+--no-binary lxml
+--no-binary xmlsec
+sentry-sdk[django]==2.20.0
+# === plugins ===
+# adestis-netbox-plugin-account-management==1.9.2
+# netbox-bgp~=0.15.0
+# netbox-data-flows~=1.1.0
+# #NbRisk~=41.0
+# netbox-plugin-dns~=1.2.1
+# # === end of file ===

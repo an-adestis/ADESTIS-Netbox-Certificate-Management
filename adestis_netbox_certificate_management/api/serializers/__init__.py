@@ -1,1 +1,1 @@
-from .certificate_serializer import *
+from .certificate_serializers import *

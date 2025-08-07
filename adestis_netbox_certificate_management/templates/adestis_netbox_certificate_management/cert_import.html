@@ -1,0 +1,10 @@
+{% extends 'generic/object_list.html' %}
+{% load helpers %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_controls %}
+  <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate_bulk_import_certificate' %}{% querystring request %}" class="btn btn-primary">
+    <i class="mdi mdi-import"></i> Import Certificate
+  </a>
+{% endblock %}

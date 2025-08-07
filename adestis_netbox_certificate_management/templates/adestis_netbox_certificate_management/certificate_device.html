@@ -1,0 +1,12 @@
+{% extends 'generic/object_children.html' %}
+
+{% block extra_controls %}
+  <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate_add' %}?device={{ object.pk }}" class="btn btn-primary">
+    <span class="mdi mdi-plus-thick" aria-hidden="true"></span> Add Certificate
+  </a>
+  {{ block.super }}
+{% endblock %}
+{% load buttons %}
+{% load static %}
+{% load helpers %}
+{% load plugins %}
