@@ -1,8 +1,8 @@
 from django import forms
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms.fields import CommentField, CSVChoiceField, TagFilterField
-from adestis_netbox_certificate_management.models.certificate import Certificate, CertificateStatusChoices
-from adestis_netbox_applications.models import *
+from adestis_netbox_certificate_management.models.certificate import Certificate, CertificateStatusChoices, FormatChoises
+from adestis_netbox_applications.models import InstalledApplication
 from django.utils.translation import gettext_lazy as _
 from utilities.forms.widgets import DatePicker
 from utilities.forms.rendering import FieldSet
@@ -17,6 +17,11 @@ from tenancy.models import Tenant, TenantGroup, Contact, ContactGroup
 from dcim.models import *
 from virtualization.models import *
 from utilities.forms import ConfirmationForm
+from utilities.forms import get_field_value
+
+import logging.config
+import logging
+
 
 __all__ = (
     'CertificateForm',
@@ -31,10 +36,9 @@ __all__ = (
     'CertificateAssignVirtualMachineForm',
     'CertificateAssignContactForm',
     
-    
     'CertificateRemoveApplication',
     'CertificateRemovePredecessor',
-    'CertificateRemoveSuccessor',
+
     'CertificateRemoveContact',
     'CertificateRemoveDevice',
     'CertificateRemoveCluster',
@@ -43,8 +47,8 @@ __all__ = (
     'CertificateRemoveTenant',
 )
 
-class CertificateCRTForm(forms.Form):
-    
+class CertificateCRTForm(forms.ModelForm):
+      
     certificate = forms.FileField(
         label='Certificate',
         required=True,
@@ -53,17 +57,31 @@ class CertificateCRTForm(forms.Form):
     status = forms.ChoiceField(
         required=False,
         label='Status',
-        choices=CertificateStatusChoices,
+        choices=[(CertificateStatusChoices.STATUS_ACTIVE, 'Active')]
+    )
+    
+    format = forms.ChoiceField(
+        required=False,
+        label='Format',
+        choices=FormatChoises,
+    )
+    
+    pfx_password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(),
+        label="PFX-Password",
+        help_text="Password for the .pfx file (leave blank if none was set)",
+    )
+    
+    fieldsets = (
+        FieldSet('certificate', 'status', 'format', 'pfx_password', name=_('Import Certificate')),
     )
     
     class Meta:
         model = Certificate
-        fields = ['name', 'status', 'valid_from', 'valid_to', 'contact_group',  'subject', 'subject_alternative_name','issuer_parent_certificate', 'key_technology',  'issuer', 'certificate', 'tags']
+        fields = ['status', 'format', 'certificate', 'pfx_password']
         default_return_url = 'plugins:adestis_netbox_certificate_management:certificate_list'
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["certificate"].widget.attrs.update({"multiple": "true"})
+             
 
 class CertificateForm(NetBoxModelForm):
 
@@ -138,7 +156,7 @@ class CertificateForm(NetBoxModelForm):
     
     fieldsets = (
         FieldSet('name', 'description', 'status', 'tags', name=_('Certificate')),
-        FieldSet('certificate', 'successor_certificates', 'issuer_parent_certificate', 'subject', 'supplier_product', 'subject_alternative_name', 'key_technology', name=_('Certificate Chain')),
+        FieldSet('certificate',  'issuer_parent_certificate', 'subject', 'supplier_product', 'subject_alternative_name', 'key_technology', name=_('Certificate Chain')),
         FieldSet('tenant_group', 'tenant',  name=_('Tenant')), 
         FieldSet('cluster_group', 'cluster', 'virtual_machine', name=_('Virtualization')),   
         FieldSet('device', name=_('Device')),
@@ -148,7 +166,7 @@ class CertificateForm(NetBoxModelForm):
 
     class Meta:
         model = Certificate
-        fields = ['name', 'description', 'status',  'tenant', 'tenant_group', 'cluster', 'installedapplication', 'cluster_group', 'virtual_machine', 'supplier_product', 'device', 'contact', 'comments', 'tags', 'contact_group', 'certificate', 'successor_certificates', 'contact']
+        fields = ['name', 'description', 'status',  'tenant', 'tenant_group', 'cluster', 'installedapplication', 'cluster_group', 'virtual_machine', 'supplier_product', 'device', 'contact', 'comments', 'tags', 'contact_group', 'certificate', 'contact']
         help_texts = {
             'status': "Example text"
         }
@@ -271,7 +289,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
 
     fieldsets = (
         FieldSet('name', 'description', 'status', 'tags', name=_('Certificate')),
-        FieldSet('certificate', 'successor_certificates', 'supplier_product', name=_('Certificate Chain')),
+        FieldSet('certificate', 'supplier_product', name=_('Certificate Chain')),
         FieldSet('valid_from', 'valid_to', name=_('Validity')),
         FieldSet('tenant_group', 'tenant',   name=_('Tenant')),
         FieldSet('cluster_group', 'cluster', 'virtual_machine', name=_('Virtualization')),
@@ -300,7 +318,7 @@ class CertificateFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet('q', 'index'),
         FieldSet('name', 'description', 'status', 'tags', name=_('Certificate')),
-        FieldSet('certificate_id', 'successor_certificates', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'supplier_product',  name=_('Certificate Chain')),
+        FieldSet('certificate_id', 'issuer_parent_certificate', 'subject', 'subject_alternative_name', 'key_technology', 'supplier_product',  name=_('Certificate Chain')),
         FieldSet('valid_from', 'valid_to', name=_('Validity')),
         FieldSet('tenant_group_id', 'tenant_id',  name=_('Tenant')),
         FieldSet('cluster_group', 'cluster', 'virtual_machine', name=_('Virtualization')),
@@ -352,12 +370,6 @@ class CertificateFilterForm(NetBoxModelFilterSetForm):
         queryset=Certificate.objects.all(),
         required=False,
         label=_('Issuer')
-    )
-    
-    successor_certificates = DynamicModelMultipleChoiceField(
-        queryset=Certificate.objects.all(),
-        required=False,
-        label=_('Successor Certificate')
     )
     
     virtual_machine = DynamicModelMultipleChoiceField(
@@ -482,14 +494,6 @@ class CertificateCSVForm(NetBoxModelImportForm):
         help_text=_('Assigned virtual machine')
     )
     
-    successor_certificate = CSVModelMultipleChoiceField(
-        label=_('Successor Certificate'),
-        queryset=Certificate.objects.all(),
-        required=True,
-        to_field_name='name',
-        help_text=_('Assigned successor certificate')
-    )
-    
     device = CSVModelMultipleChoiceField(
         label=_('Device'),
         queryset=Device.objects.all(),
@@ -516,7 +520,7 @@ class CertificateCSVForm(NetBoxModelImportForm):
 
     class Meta:
         model = Certificate
-        fields = ['name' ,'status', 'valid_from', 'valid_to', 'contact_group', 'supplier_product', 'subject', 'subject_alternative_name', 'key_technology', 'successor_certificate', 'device', 'virtual_machine', 'cluster', 'cluster_group', 'contact', 'issuer', 'installedapplication', 'comments', 'description', 'certificate', 'tags']
+        fields = ['name' ,'status', 'valid_from', 'valid_to', 'contact_group', 'supplier_product', 'subject', 'subject_alternative_name', 'key_technology', 'device', 'virtual_machine', 'cluster', 'cluster_group', 'contact', 'issuer', 'installedapplication', 'comments', 'description', 'certificate', 'tags']
         default_return_url = 'plugins:adestis_netbox_certificate_management:Certificate_list'
         
 class CertificateAssignDeviceForm(forms.Form):
@@ -701,19 +705,13 @@ class CertificateRemovePredecessor(ConfirmationForm):
         widget=forms.MultipleHiddenInput()
     )
     
-class CertificateRemoveSuccessor(ConfirmationForm):
-    pk = forms.ModelMultipleChoiceField(
-        queryset=Certificate.objects.all(),
-        widget=forms.MultipleHiddenInput()
-    )
     
 class CertificateRemoveDevice(ConfirmationForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=Device.objects.all(),
         widget=forms.MultipleHiddenInput()
     ) 
-    
-    
+        
 class CertificateRemoveVirtualMachine(ConfirmationForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=VirtualMachine.objects.all(),
@@ -731,8 +729,6 @@ class CertificateRemoveClusterGroup(ConfirmationForm):
         queryset=ClusterGroup.objects.all(),
         widget=forms.MultipleHiddenInput()
     )
-    
-
 
 class CertificateRemoveTenant(ConfirmationForm):
     pk = forms.ModelMultipleChoiceField(

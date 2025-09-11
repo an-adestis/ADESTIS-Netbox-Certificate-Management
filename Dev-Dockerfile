@@ -1,5 +1,5 @@
 ARG FROM_IMAGE=netboxcommunity/netbox
-ARG FROM_TAG=v4.2.9-3.2.1
+ARG FROM_TAG=v4.3.7-3.3.0
 ARG FROM=${FROM_IMAGE}:${FROM_TAG}
 FROM ${FROM}
 

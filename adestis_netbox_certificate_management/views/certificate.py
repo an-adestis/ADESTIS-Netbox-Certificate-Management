@@ -30,6 +30,15 @@ from virtualization.forms import VirtualMachineForm, ClusterForm, ClusterGroupFo
 from virtualization.tables import VirtualMachineTable, ClusterTable, ClusterGroupTable
 import re
 
+from contextlib import contextmanager
+from tempfile import NamedTemporaryFile
+from pathlib import Path
+
+from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
+from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
+
+
+
 
 __all__ = (
     'CertificateView',
@@ -43,7 +52,7 @@ __all__ = (
     'CertificateBulkImportCertificateView',
     'CertificateRemoveApplicationView',
     'CertificateAffectedSuccessorCertificateView',
-    'CertificateRemoveSuccessorView',
+
     'DeviceAffectedCertificateView',
     'ClusterAffectedCertificateView',
     'ClusterGroupAffectedCertificateView',
@@ -69,6 +78,21 @@ __all__ = (
     'CertificateRemoveTenantView',
     'TenantAffectedCertificateView',
 )
+
+@contextmanager
+def pfx_bytes_to_pem(pfx_bytes, pfx_password):
+            '''Convert .pfx file to PEM format for use in requests or analysis.'''
+            private_key, main_cert, add_certs = load_key_and_certificates(
+                pfx_bytes, pfx_password.encode('utf-8'), None
+            )
+
+            with NamedTemporaryFile(suffix=".pem", delete=True, mode="wb") as t_pem:
+                t_pem.write(private_key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()))
+                t_pem.write(main_cert.public_bytes(Encoding.PEM))
+                for ca in add_certs or []:
+                    t_pem.write(ca.public_bytes(Encoding.PEM))
+                t_pem.flush()
+                yield t_pem.name
 
 class CertificateView(generic.ObjectView):
     queryset = Certificate.objects.all()
@@ -110,8 +134,10 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
     queryset = Certificate.objects.all()
     template_name = 'adestis_netbox_certificate_management/crt_import.html'
     
+
+        
     def get(self, request):
-        form = CertificateCRTForm()
+        form = CertificateCRTForm(request.POST, request.FILES,)
         context = {
             'form': form,
             'object': Certificate(),  # wichtig für object_edit.html
@@ -120,52 +146,113 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
         return render(request, self.template_name, context)
     
     def post(self, request):
-        form = CertificateCRTForm(request.POST, request.FILES)
+        form = CertificateCRTForm(request.POST, request.FILES, )
         if form.is_valid():
             files = request.FILES.getlist('certificate')
             created = []
             for file in files:
-                        cert_text = file.read().decode()
-                        
-                        match = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", cert_text, flags=re.DOTALL) # mit re.DOTALL werden Zeilenumbrüche (\n) mit eingebunden
-                        if not match:
-                             raise ValidationError("No valid certificate found in file")
+                filename = file.name.lower()
+                file_content = file.read()
 
-                        for idx, single_cert in enumerate(match):
-                            cleaned_cert = single_cert.replace("\r\n", "").replace("\n", "").strip()
+                # Handle PFX / P12 certificate files
+                if filename.endswith('.pfx') or filename.endswith('.p12'):
+                    pfx_password = form.cleaned_data.get('pfx_password') or ''  
+                    try:
+                        with pfx_bytes_to_pem(file_content, pfx_password) as pem_path:
+                            with open(pem_path, 'r') as pem_file:
+                                pem_content = pem_file.read()
+
+                            certs = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", pem_content, flags=re.DOTALL)
+                            if not certs:
+                                raise ValidationError("No valid certificate found inside PFX file.")
                             
-                            existing_cert = Certificate.objects.filter(certificate=cleaned_cert)
-                            if existing_cert.exists():
-                                existing_cert = existing_cert.first()
-                                return redirect(existing_cert.get_absolute_url())
+                            # Process each individual certificate found
+                            for single_cert in certs:
+                                cleaned_cert = single_cert.replace("\r\n", "").replace("\n", "").strip()
+                                existing_cert = Certificate.objects.filter(certificate=cleaned_cert)
+                                if existing_cert.exists():
+                                    existing_cert = existing_cert.first()
+                                    return redirect(existing_cert.get_absolute_url())
+
+                                cert_data = cert_utils.parse_cert(single_cert)
+                                subject_key_identifier = cert_data.get("subject_key_identifier") or hashlib.sha1(cleaned_cert.encode()).hexdigest()
+
+                                # Extract Common Name (CN) from subject field
+                                common_name = cert_data.get("subject", "")
+                                for pair in cert_data.get("subject", "").split("\n"):
+                                    if "=" in pair:
+                                        name, value = pair.split("=")
+                                        if name == "CN":
+                                            common_name = value
+                                            
+                                # Create new Certificate object in database
+                                cert = Certificate.objects.create(
+                                    certificate=cleaned_cert,
+                                    name=common_name,
+                                    subject_key_identifier=subject_key_identifier,
+                                    status=CertificateStatusChoices.STATUS_ACTIVE
+                                )
+                                created.append(cert)
+
+                    except Exception as e:
+                        # Handle conversion or parsing errors
+                        form.add_error(None, f"Import fehlgeschlagen: {e}")
+                        context = {
+                            'form': form,
+                            'object': Certificate(),
+                            'return_url': reverse('plugins:adestis_netbox_certificate_management:certificate_list'),
+                        }
+                        return render(request, self.template_name, context)
+
+                else:
+                    # Handle plain-text certificate files (.crt, .pem, etc.)
+                    cert_text = file_content.decode()
+                        
+                    match = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", cert_text, flags=re.DOTALL) 
+                    if not match:
+                        raise ValidationError("No valid certificate found in file")
+
+                    for idx, single_cert in enumerate(match):
+                        cleaned_cert = single_cert.replace("\r\n", "").replace("\n", "").strip()
+                        
+                        # Check for duplicate in the database     
+                        existing_cert = Certificate.objects.filter(certificate=cleaned_cert)
+                        if existing_cert.exists():
+                            existing_cert = existing_cert.first()
+                            return redirect(existing_cert.get_absolute_url())
+                        
+                        # Parse certificate details    
+                        cert_data = cert_utils.parse_cert(single_cert)
+                        
+                        # Determine subject key identifier (fallback to SHA-1 hash if missing)    
+                        subject_key_identifier = cert_data.get("subject_key_identifier")
+                        if not subject_key_identifier:
+                            subject_key_identifier = hashlib.sha1(cleaned_cert.encode()).hexdigest()
                             
-                            cert_data = cert_utils.parse_cert(single_cert)
-                            
-                            subject_key_identifier = cert_data.get("subject_key_identifier")
-                            if not subject_key_identifier:
-                             subject_key_identifier = hashlib.sha1(cleaned_cert.encode()).hexdigest()
-                            
-                            common_name = cert_data["subject"]
-                            for name,value in [ (pair.split("=")) for pair in cert_data["subject"].split("\n") ]:
-                                if name == "CN":
-                                    common_name=value
-                                    
-                            cert = Certificate.objects.create(
+                        # Extract Common Name (CN) from the subject    
+                        common_name = cert_data["subject"]
+                        for name,value in [ (pair.split("=")) for pair in cert_data["subject"].split("\n") ]:
+                            if name == "CN":
+                                common_name=value
+                        # Save certificate to the database            
+                        cert = Certificate.objects.create(
                                 certificate=cleaned_cert,
                                 name=common_name,
                                 subject_key_identifier=subject_key_identifier,
                                 status = CertificateStatusChoices.STATUS_ACTIVE
-                            )
-                        created.append(cert) #The append() method appends an element to the end of the list.
+                        )
+                        created.append(cert) 
+                        
+            # Redirect to certificate list view if any new certificates were created
             if created:
                     return redirect(reverse('plugins:adestis_netbox_certificate_management:certificate_list'))
+        # Re-render form with errors if validation fails
         context = {
             'form': form,
             'return_url': reverse('plugins:adestis_netbox_certificate_management:certificate_list'),
         }
-        return render(request, self.template_name, context)        
-        
-    
+        return render(request, self.template_name, context)  
+      
 @register_model_view(Certificate, name='applications')
 class CertificateAffectedInstalledApplicationView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
@@ -277,64 +364,23 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= Certificate
     table = CertificateTable
-    template_name = "adestis_netbox_certificate_management/successor_certificates.html"
+    # template_name = "adestis_netbox_certificate_management/successor_certificates.html"
     actions = {
         'add': {'add'},
         'export': {'view'},
         'bulk_import': {'add'},
         'bulk_edit': {'change'},
-        'bulk_remove_successor_certificates': {'change'},
     }
 
     tab = ViewTab(
         label=_('Successor Certificates'),
-        badge=lambda obj: obj.successor_certificate.count(),
+        badge=lambda obj: obj.authority_certificates.count(),
         hide_if_empty=False,
         weight=600
     )
     
     def get_children(self, request, parent):
-        return Certificate.objects.restrict(request.user, 'view').filter(successor_certificates=parent)
-
-@register_model_view(Certificate, 'remove_successor_certificate', path='successorcertificate/remove')
-class CertificateRemoveSuccessorView(generic.ObjectEditView):
-    queryset = Certificate.objects.all()
-    form = CertificateRemoveSuccessor
-    template_name = 'generic/bulk_remove.html'
-
-    def post(self, request, pk):
-
-        certificate = get_object_or_404(self.queryset, pk=pk)
-
-        if '_confirm' in request.POST:
-            
-            form = self.form(request.POST)
-            if form.is_valid():
-                
-                successor_pks = form.cleaned_data['pk']
-                with transaction.atomic():
-                    certificate.successor_certificate.remove(*successor_pks)
-                    certificate.save()
-
-                messages.success(request, _("Removed {count} successor certificates from certificate {certificate}").format(
-                    count=len(successor_pks),
-                    certificate=certificate
-                ))
-                return redirect(certificate.get_absolute_url())
-        else:
-            form = self.form(initial={'pk': request.POST.getlist('pk')})
-
-        selected_objects = Certificate.objects.filter(pk__in=form.initial['pk'])
-        successor_table = CertificateTable(list(selected_objects), orderable=False)
-        successor_table.configure(request)
-
-        return render(request, self.template_name, {
-            'form': form,
-            'parent_obj': certificate,
-            'table': successor_table,
-            'obj_type_plural': 'successor certificates',
-            'return_url': certificate.get_absolute_url(),
-        }) 
+        return Certificate.objects.restrict(request.user, 'view').filter(authority_key_identifier=parent)
         
 @register_model_view(Certificate, name='devices')
 class CertificateAffectedDeviceView(generic.ObjectChildrenView):
@@ -348,6 +394,13 @@ class CertificateAffectedDeviceView(generic.ObjectChildrenView):
         badge=lambda obj: obj.device.count(),
         weight=600
     )
+    actions = {
+        'add': {'add'},
+        'export': {'view'},
+        'bulk_import': {'add'},
+        'bulk_edit': {'change'},
+        'bulk_remove_device': {'change'},
+    }
     
     def get_children(self, request, parent):
         return Device.objects.restrict(request.user, 'view').filter(certificate=parent)
@@ -464,6 +517,13 @@ class CertificateAffectedClusterView(generic.ObjectChildrenView):
     child_model= Cluster
     table = ClusterTableCertificate
     template_name = "adestis_netbox_certificate_management/cluster.html"
+    actions = {
+        'add': {'add'},
+        'export': {'view'},
+        'bulk_import': {'add'},
+        'bulk_edit': {'change'},
+        'bulk_remove_cluster': {'change'},
+    }
 
     tab = ViewTab(
         label=_('Clusters'),
@@ -485,7 +545,7 @@ class ClusterAffectedCertificateView(generic.ObjectChildrenView):
         'export': {'view'},
         'bulk_import': {'add'},
         'bulk_edit': {'change'},
-        'bulk_remove_cluster': {'change'},
+        
     }
 
     tab = ViewTab(
@@ -596,6 +656,13 @@ class CertificateAffectedClusterGroupView(generic.ObjectChildrenView):
         badge=lambda obj: obj.cluster_group.count(),
         weight=600
     )
+    actions = {
+        'add': {'add'},
+        'export': {'view'},
+        'bulk_import': {'add'},
+        'bulk_edit': {'change'},
+        'bulk_remove_cluster_group': {'change'},
+    }
 
     def get_children(self, request, parent):
         return ClusterGroup.objects.restrict(request.user, 'view').filter(certificate=parent)
@@ -964,7 +1031,7 @@ class CertificateRemoveContactView(generic.ObjectEditView):
             'return_url': certificate.get_absolute_url(),
         })
         
-@register_model_view(Tenant, name='domains')
+@register_model_view(Tenant, name='certificates')
 class TenantAffectedCertificateView(generic.ObjectChildrenView):
     queryset = Tenant.objects.all()
     child_model= Certificate

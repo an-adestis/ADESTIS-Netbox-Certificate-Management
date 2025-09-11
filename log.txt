@@ -1,0 +1,179 @@
+commit c23567b7ee829ab29736421a51e2f1eac91366f6
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Tue Aug 26 09:32:40 2025 +0200
+
+    editing the Import Form
+
+commit de5f84915e458ece8a24c610380c4410d91e3869
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Mon Aug 25 16:51:23 2025 +0200
+
+    implementierung von importmöglichkeit für prf datein
+
+commit 30959b2c903d90c8ef1514a946a84bca701fb262
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Aug 8 10:39:36 2025 +0200
+
+    verbesserung der view
+
+commit bb7f087c527760523b5b75ae3cb1289976a65ea2
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Thu Aug 7 13:40:27 2025 +0200
+
+    editing the tab views
+
+commit a18826c5163d6237bc6ed8994acc18f06ff42c37
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Aug 6 16:53:06 2025 +0200
+
+    removing Certificate Tab from Applications
+
+commit 126523b9596a5d5feb714f409b703d300cdbd4d3
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 25 16:16:05 2025 +0200
+
+    fixxed issues
+
+commit cd7453c18da881a799d5ed3f3e6211a72e3982bc
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 25 16:12:55 2025 +0200
+
+    fixxed new issues
+
+commit 51483627802aa101c13e9c07a5d7da77b37484a5
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Thu Jul 24 17:01:33 2025 +0200
+
+    implemented new funktions
+
+commit 5fa849ddb2c94e9637126de45e0a8de98b197262
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 16 12:09:33 2025 +0200
+
+    readme changes
+
+commit 42e0e89ec238622d22862eee5647b15c32d8e161
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 16 12:06:42 2025 +0200
+
+    new pictures
+
+commit 1dcfdf4f42e97d84544fa5f3243e151eb0167f2a
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 16 11:59:56 2025 +0200
+
+    change the name
+
+commit 22d68b9ffaa2b82b084d8d2405237458995b32d4
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 11 15:09:31 2025 +0200
+
+    versions erhöhung
+
+commit 03b8c3c226f3d7c334f1a3f3f37d268986f2fe9f
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 11 13:59:23 2025 +0200
+
+    readme änderungen
+
+commit 438741448f148f81f7bba6d3e958558038601156
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 11 10:43:16 2025 +0200
+
+    verbesserungen
+
+commit 4d7f344527eed59d75a4fdecc07ea24d8de8f837
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 11 09:25:58 2025 +0200
+
+    setup.py
+
+commit 04078807c183917dfb4d5edd2007cfb0758a3e90
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Thu Jul 10 15:20:46 2025 +0200
+
+    bereit für den ersten launch
+
+commit c50b7b1025f10e6a6c34d5249d05e8448af94815
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 9 17:17:22 2025 +0200
+
+    verbesserungen
+
+commit 5146d18acb1bdf1a1385b5e069d33eb0362d19dd
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 4 12:18:02 2025 +0200
+
+    editing README
+
+commit e7493c80cfec348f035682475e6c553d98bb704a
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Fri Jul 4 10:56:23 2025 +0200
+
+    vervollständigung von certificates
+
+commit f9096d5c51b14ea6a3e7cb6c66e096027b1ce936
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Thu Jul 3 16:46:24 2025 +0200
+
+    neues cert plugin
+
+commit 356709c993bc368b705e4f5e6fed8df47a6f92b4
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 2 16:58:33 2025 +0200
+
+    cars erstellt morgen certificate rüber bringen
+
+commit 7c5296598f31802ab7ba3341bf69d2044d92d3e8
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 2 13:29:16 2025 +0200
+
+    änderungen
+
+commit 38238c0cba42f97a110d2d3066e112d340de1ea4
+Author: amin nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Jul 2 13:26:51 2025 +0200
+
+    test verlauf
+
+commit d0ce23323dffcff6f06c0b52f98e7ca9fe71f318
+Author: Lukas Klingelhöffer <l.klingelhoeffer@adestis.de>
+Date:   Mon Mar 10 12:57:59 2025 +0000
+
+    fix: filters
+
+commit b7a2ac3ddf6829be2c45e8df361e5b07de0e3bda
+Author: Amin Nabiyev <a.nabiyev@adestis.de>
+Date:   Mon Mar 10 12:36:21 2025 +0000
+
+    feat: filters
+
+commit 94eba10e727c00a7d9d338f9a97737e98c265dda
+Author: Amin Nabiyev <a.nabiyev@adestis.de>
+Date:   Wed Feb 19 13:37:51 2025 +0000
+
+    feat: add name to entity
+
+commit 256ed6eb78206f69ff9ad0445c79a9e170f47e29
+Author: Amin Nabiyev <a.nabiyev@adestis.de>
+Date:   Thu Jan 30 08:24:33 2025 +0000
+
+    documentation von Meilenstein1
+
+commit ce898754a1664421793fa84bbef9e325f87a39b7
+Author: Lukas Klingelhöffer <l.klingelhoeffer@adestis.de>
+Date:   Thu Jan 23 11:05:00 2025 +0000
+
+    feat: initialize project
+
+commit a6207ed6e69b0913af249d29f7b5241c251a735e
+Author: Lukas Klingelhöffer <l.klingelhoeffer@adestis.de>
+Date:   Thu Jan 23 09:46:14 2025 +0000
+
+    Initial commit
+
+commit 00ffef3d47f0f80a6390c4052d293a0906f3f199
+Author: an-adestis <a.nabiyev@adestis.de>
+Date:   Thu Jul 10 14:23:30 2025 +0200
+
+    Initial commit

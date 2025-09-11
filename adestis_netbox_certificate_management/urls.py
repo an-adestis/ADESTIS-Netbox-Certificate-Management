@@ -46,11 +46,6 @@ urlpatterns = (
     path('certificates/contacts/', CertificateAffectedContactView.as_view(),
          name='certificatecontacts_list'),
     
-
-    
-    
-    
-    
     
     path('certificate/<int:pk>/',
          CertificateView.as_view(), name='certificate'),

@@ -1,7 +1,7 @@
 name: "local_docker_adestis_netbox_certificate_management_plugin"
 services:
   netbox: &netbox
-    image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
+    image: docker.io/netboxcommunity/netbox:${VERSION-v4.3.0-3.3.0}
     depends_on:
     - postgres
     - redis

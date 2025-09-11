@@ -8,11 +8,36 @@ from dcim.models import *
 from virtualization.models import *
 from adestis_netbox_applications import *
 from taggit.managers import TaggableManager
+from django.core.validators import RegexValidator, ValidationError
+from django import forms
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+from utilities.validators import validate_regex
+from django.utils.translation import gettext_lazy as _
+from netbox.models.features import CloningMixin, ExportTemplatesMixin
+from netbox.models import ChangeLoggedModel
+from extras.models import TaggedItem
+from taggit.managers import TaggableManager
 
 __all__ = (
     'CertificateStatusChoices',
     'Certificate',
+    'FormatChoises',
 )
+
+class FormatChoises(ChoiceSet):
+    key ='Certificates.format'
+    
+    SELECT_File = 'select'
+    PFX_FILE = 'pfx'
+    PEM_FILE = 'pem'
+    
+    
+    CHOICES = [
+        (SELECT_File, 'Select'),
+        (PFX_FILE, 'PFX'),
+        (PEM_FILE, 'PEM'),
+    ]
 
 class CertificateStatusChoices(ChoiceSet):
     key = 'Certificates.status'
@@ -25,13 +50,29 @@ class CertificateStatusChoices(ChoiceSet):
         (STATUS_INACTIVE, 'Inactive', 'red'),
     ]
     
-class Certificate(NetBoxModel):
+class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
 
     status = django_models.CharField(
         max_length=50,
         choices=CertificateStatusChoices,
         verbose_name='Status',
         help_text='Status'
+    )
+    
+    tags = TaggableManager(through=TaggedItem)
+    
+    format = django_models.CharField(
+        max_length=50, 
+        choices=FormatChoises,
+        verbose_name=_('format'),
+        default=FormatChoises.PFX_FILE,
+        help_text='Format'
+    )
+    
+    pfx_password = django_models.CharField(
+        blank=True,
+        max_length=500,
+        verbose_name=_('Password'),
     )
 
     comments = django_models.TextField(
@@ -48,19 +89,19 @@ class Certificate(NetBoxModel):
     )
     
     subject = django_models.CharField(
-        max_length=2000,
+        max_length=512,
         verbose_name='Common Name',
         blank=True
     )
     
     supplier_product = django_models.CharField(
-        max_length=2000,
+        max_length=512,
         verbose_name='Supplier Product',
         blank=True
     )
     
     issuer = django_models.CharField(
-        max_length=2000,
+        max_length=512,
         verbose_name='Issuer',
         blank=True
     )
@@ -83,27 +124,28 @@ class Certificate(NetBoxModel):
     )
     
     authority_identifier = django_models.CharField(
-        max_length=100,
+        max_length=512,
         unique=True,
         null=True,
         blank=True
     )
     
     subject_key_identifier = django_models.CharField(
-        max_length=40,
+        max_length=512,
         unique=True,
         null=False,
         blank=False
     )
     
     key_technology = django_models.CharField(
-        max_length=2000,
+        max_length=512,
         verbose_name='Key Technology',
-        blank=True
+        blank=True,
+        null=True
     )
     
     subject_alternative_name = django_models.CharField(
-        max_length=2000,
+        max_length=512,
         verbose_name='Subject Alternative Names',
         blank=True,
         null=True
@@ -185,7 +227,6 @@ class Certificate(NetBoxModel):
     
     cluster = django_models.ManyToManyField(
         to = 'virtualization.Cluster',
-        
         related_name = 'certificate',
         verbose_name='Clusters',
         blank = True
@@ -199,18 +240,19 @@ class Certificate(NetBoxModel):
         blank = True
     )
     
-    successor_certificates = django_models.ForeignKey(
-        'self',
-        verbose_name='Successor Certificate',
-        on_delete = django_models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='successor_certificate'
-    )
+    # successor_certificates = django_models.ManyToOneField(
+    #     'self',
+        
+    #     blank=True, 
+    #     # related_name='successor_certificate',
+    #     # on_delete=django_models.SET_NULL
+    # )
+
     
     class Meta:
         verbose_name_plural = "Certificates"
         verbose_name = 'Certificate'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -231,4 +273,4 @@ class Certificate(NetBoxModel):
         CertificateMetadataExtractorJob.enqueue()
         
 
- 
+    
