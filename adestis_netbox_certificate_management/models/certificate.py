@@ -248,7 +248,6 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
     #     # on_delete=django_models.SET_NULL
     # )
 
-    
     class Meta:
         verbose_name_plural = "Certificates"
         verbose_name = 'Certificate'

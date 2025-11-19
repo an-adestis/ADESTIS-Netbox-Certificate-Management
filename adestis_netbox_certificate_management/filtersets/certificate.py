@@ -23,7 +23,7 @@ __all__ = (
     'CertificateFilterSet',
 )
 
-class CertificateFilterSet(ChangeLoggedModelFilterSet):
+class CertificateFilterSet(NetBoxModelFilterSet):
     
     valid_from = django_filters.DateFilter(
         required=False,
@@ -141,7 +141,21 @@ class CertificateFilterSet(ChangeLoggedModelFilterSet):
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
-        return queryset.filter( Q(status__icontains=value) )
+        return queryset.filter(
+            Q(status__icontains=value) |
+            Q(name__icontains=value) |
+            Q(contact__name__icontains=value) |
+            Q(key_technology__icontains=value) |
+            Q(tenant__name__icontains=value) |
+            Q(tenant_group__name__icontains=value) |
+            Q(virtual_machine__name__icontains=value) |
+            Q(device__name__icontains=value) |
+            Q(cluster__name__icontains=value) |
+            Q(cluster_group__name__icontains=value) |
+            Q(installedapplication__name__icontains=value) |
+            Q(subject__icontains=value) |
+            Q(contact_group__name__icontains=value)
+        )
     
     def filter_subject_alternative_name(self, queryset, name, value):
         if not value.strip():

@@ -31,9 +31,6 @@ class CertificateMetadataExtractorJob(JobRunner):
         
         for certificate in Certificate.objects.all():
             self.set_predecessor_certificate(certificate)
-        
-
-
 
     def clean_and_extract(self, certificate: Certificate): 
         cert_text = certificate.certificate
@@ -58,7 +55,6 @@ class CertificateMetadataExtractorJob(JobRunner):
             if name == "CN":
                 issuer=value
         
-            
         common_name = cert_data["subject"]
         for name,value in [ (pair.split("=")) for pair in cert_data["subject"].split("\n") ]:
             if name == "CN":

@@ -22,8 +22,6 @@ class CertificateTable(NetBoxTable):
     )
 
     comments = columns.MarkdownColumn()
-
-    # tags = columns.TagColumn()
     
     name = columns.MarkdownColumn(
         linkify=True
@@ -68,10 +66,6 @@ class CertificateTable(NetBoxTable):
     device = tables.Column(
         linkify=True
     )
-    
-    # successor_certificates = tables.Column(
-    #     linkify=True
-    # )
     
     issuer_parent_certificate = tables.Column(
         linkify=True

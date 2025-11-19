@@ -25,10 +25,7 @@ services:
     - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
   netbox-worker:
     # <<: *netbox
-    image: adestis-netbox-certificate-management-plugin:latest
-    build:
-      context: ../
-      dockerfile: Dev-Dockerfile
+    image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
     depends_on:
       netbox:
         condition: service_healthy
@@ -38,23 +35,17 @@ services:
     - rqworker
     env_file: env/netbox.env
     user: 'unit:root'
-    ports:
-      - "13002:8080"
     healthcheck:
       start_period: 20s
       timeout: 3s
       interval: 15s
       test: "ps -aux | grep -v grep | grep -q rqworker || exit 1"
     volumes:
-    # - ./configuration:/etc/netbox/config:z,ro
-    - ./configuration/worker_logging.py:/etc/netbox/config/logging.py
-    - ./configuration/configuration.py:/etc/netbox/config/configuration.py
-    - ./configuration/extra.py:/etc/netbox/config/extra.py
-    - ./configuration/plugins.py:/etc/netbox/config/plugins.py
+    - ./configuration:/etc/netbox/config:z,ro
     - netbox-media-files:/opt/netbox/netbox/media:rw
     - netbox-reports-files:/opt/netbox/netbox/reports:rw
     - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
-    - ../adestis_netbox_certificate_management/migrations:/opt/netbox/venv/lib/python3.12/site-packages/adestis_netbox_certificate_management/migrations
+
 
   # netbox-housekeeping:
   #   <<: *netbox
