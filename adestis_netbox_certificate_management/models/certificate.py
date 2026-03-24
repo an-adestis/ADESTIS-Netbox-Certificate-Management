@@ -125,14 +125,14 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
     
     authority_identifier = django_models.CharField(
         max_length=512,
-        unique=True,
+        unique=False,
         null=True,
         blank=True
     )
     
     subject_key_identifier = django_models.CharField(
         max_length=512,
-        unique=True,
+        unique=False,
         null=False,
         blank=False
     )

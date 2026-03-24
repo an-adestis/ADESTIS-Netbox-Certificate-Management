@@ -5,6 +5,7 @@ from adestis_netbox_certificate_management.views.certificate import *
 from adestis_netbox_certificate_management.models import *
 from django.urls import include
 from utilities.urls import get_model_urls
+from adestis_netbox_certificate_management import views
 
 urlpatterns = (
 
@@ -61,5 +62,7 @@ urlpatterns = (
     
     path('certificates/tenants/', TenantAffectedCertificateView.as_view(),
          name='certificatetenants_list'), 
+    
+     path("certificate/run/", views.run_myjob, name="run_myjob"),
 
 )

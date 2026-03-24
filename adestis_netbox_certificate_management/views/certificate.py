@@ -77,6 +77,7 @@ __all__ = (
     'CertificateRemoveVirtualMachineView',
     'CertificateRemoveTenantView',
     'TenantAffectedCertificateView',
+    'run_myjob',
 )
 
 @contextmanager
@@ -196,7 +197,7 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
 
                     except Exception as e:
                         # Handle conversion or parsing errors
-                        form.add_error(None, f"Import fehlgeschlagen: {e}")
+                        form.add_error(None, f"Import failed: {e}")
                         context = {
                             'form': form,
                             'object': Certificate(),
@@ -1091,6 +1092,15 @@ class CertificateRemoveTenantView(generic.ObjectEditView):
             'form': form,
             'parent_obj': certificate,
             'table': tenant_table,
-            'obj_type_plural': 'tenantss',
+            'obj_type_plural': 'tenants',
             'return_url': certificate.get_absolute_url(),
         })
+
+from django.shortcuts import redirect
+from adestis_netbox_certificate_management.jobs import CertificateMetadataExtractorJob
+from netbox.jobs import JobRunner
+
+def run_myjob(request):
+    job_instance = CertificateMetadataExtractorJob(JobRunner)
+    job_instance.enqueue()  
+    return redirect('home')

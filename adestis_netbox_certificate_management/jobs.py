@@ -31,6 +31,9 @@ class CertificateMetadataExtractorJob(JobRunner):
         
         for certificate in Certificate.objects.all():
             self.set_predecessor_certificate(certificate)
+            
+        for certificate in Certificate.objects.filter(authority_key_identifier__isnull=True):
+            self.set_predecessor_certificate(certificate)
 
     def clean_and_extract(self, certificate: Certificate): 
         cert_text = certificate.certificate
@@ -113,9 +116,10 @@ class CertificateMetadataExtractorJob(JobRunner):
                 certificate.subject_key_identifier = subject_hex
                 
                 
-                issuer_parent_certificate = Certificate.objects.filter(
-                    subject_key_identifier=authority_hex
-                ).first()
+                issuer_parent_certificate = Certificate.objects.filter(subject_key_identifier=authority_hex).first()
+                if issuer_parent_certificate:
+                    certificate.authority_key_identifier = issuer_parent_certificate
+                    certificate.save(update_fields=["authority_key_identifier", "subject_key_identifier", "authority_identifier"])
                 
                 certificate.authority_key_identifier = issuer_parent_certificate
                 certificate.save(update_fields=["authority_key_identifier", "subject_key_identifier", "authority_identifier"])

@@ -155,7 +155,7 @@ class CertificateFilterSet(NetBoxModelFilterSet):
             Q(installedapplication__name__icontains=value) |
             Q(subject__icontains=value) |
             Q(contact_group__name__icontains=value)
-        )
+        ).distinct()
     
     def filter_subject_alternative_name(self, queryset, name, value):
         if not value.strip():

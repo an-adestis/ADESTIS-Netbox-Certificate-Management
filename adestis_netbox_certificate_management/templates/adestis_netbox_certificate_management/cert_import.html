@@ -7,4 +7,43 @@
   <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate_bulk_import_certificate' %}{% querystring request %}" class="btn btn-primary">
     <i class="mdi mdi-import"></i> Import Certificate
   </a>
+
+  <a href="{% url 'plugins:adestis_netbox_certificate_management:run_myjob' %}" 
+    id="job-link" 
+    class="btn btn-primary"
+    onclick="event.preventDefault(); startJob(this);">
+      <i class="mdi mdi-reload" id="job-icon"></i> Job starten
+  </a>
+
+  <script>
+    function getCSRFToken() {
+        // CSRF Token aus Cookie holen
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    function startJob(el) {
+        const icon = document.getElementById('job-icon');
+        icon.classList.remove('mdi-import');
+        icon.classList.add('mdi-loading', 'mdi-spin');
+
+        fetch(el.href, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+            },
+        })
+        .then(response => {
+            icon.classList.remove('mdi-loading', 'mdi-spin');
+            if (response.ok) {
+                icon.classList.add('mdi-check');
+            } else {
+                icon.classList.add('mdi-alert-circle');
+            }
+        })
+        .catch(() => {
+            icon.classList.remove('mdi-loading', 'mdi-spin');
+            icon.classList.add('mdi-alert-circle');
+        });
+    }
+  </script>
 {% endblock %}
