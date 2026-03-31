@@ -1,6 +1,6 @@
 import time
 import json
-from adestis_netbox_certificate_management.models import Certificate
+from adestis_netbox_certificate_management.models import Certificate, CertificateStatusChoices
 from core.choices import JobIntervalChoices
 from netbox.jobs import JobRunner, system_job
 from django.forms.models import model_to_dict
@@ -15,6 +15,8 @@ from cryptography.x509.oid import ExtensionOID
 from django.utils.translation import gettext_lazy as _
 import logging
 from cryptography.x509.extensions import ExtensionNotFound
+
+from datetime import datetime, date, timedelta
 
 class CertificateMetadataExtractorJob(JobRunner):
     class Meta:
@@ -34,6 +36,16 @@ class CertificateMetadataExtractorJob(JobRunner):
             
         for certificate in Certificate.objects.filter(authority_key_identifier__isnull=True):
             self.set_predecessor_certificate(certificate)
+            
+        today = date.today()
+        
+        Certificate.objects.filter(valid_to__lt=today).update(
+            status=CertificateStatusChoices.STATUS_INVALIDE
+        )
+        
+        Certificate.objects.filter(valid_to__gte=today).update(
+            status=CertificateStatusChoices.STATUS_ACTIVE
+        )
 
     def clean_and_extract(self, certificate: Certificate): 
         cert_text = certificate.certificate
@@ -41,8 +53,7 @@ class CertificateMetadataExtractorJob(JobRunner):
         match = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", cert_text, flags=re.DOTALL) 
         if not match:
             raise ValidationError("No valid certificate found in file")
-        
-        # Take the first certificate in the chain as the base (main) certificate        
+    
         base_cert = match.pop(0)
         
         subject_key_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER)
@@ -74,8 +85,7 @@ class CertificateMetadataExtractorJob(JobRunner):
         certificate.save()
         
         certificate.save(update_fields=["valid_from", "valid_to", "subject", "issuer", "subject_alternative_name", "key_technology"])
-        
-        # Process any additional certificates in the chain (e.g., intermediates)
+
         while match:
                 extra_cert = match.pop(0)
                 cleaned_extra = extra_cert.replace("\r\n", "").replace("\n", "").strip()
@@ -90,7 +100,6 @@ class CertificateMetadataExtractorJob(JobRunner):
                     if name == "CN":
                         extra_common_name=value
 
-                # Avoid saving duplicates — skip if this cert already exists
                 existing = Certificate.objects.filter(certificate=extra_cert).first()
                 if existing:
                     continue
@@ -126,9 +135,9 @@ class CertificateMetadataExtractorJob(JobRunner):
                 
             except ExtensionNotFound:
              return
-            
-            
+
     def extract_and_set_fields(self, certificate: Certificate):
+        today = date.today()
         x509cert = x509.load_pem_x509_certificate(certificate.certificate.encode('utf-8'), default_backend())
                         
         subject_key_identifier = x509cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER)
@@ -150,6 +159,14 @@ class CertificateMetadataExtractorJob(JobRunner):
         certificate.key_technology=cert_data["key_technology"]
         certificate.subject_alternative_name=cert_data.get("SubjectAlternativeName", "")
 
-                
-        certificate.save(update_fields=["subject_key_identifier", "authority_key_identifier", "valid_from", "valid_to", "subject", "issuer", "subject_alternative_name", "key_technology"])
+        certificate.save(update_fields=[
+            "subject_key_identifier",
+            "authority_key_identifier",
+            "valid_from",
+            "valid_to",
+            "subject",
+            "issuer",
+            "subject_alternative_name",
+            "key_technology",
+        ])
 

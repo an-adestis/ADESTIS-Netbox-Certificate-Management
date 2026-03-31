@@ -44,10 +44,11 @@ class CertificateStatusChoices(ChoiceSet):
 
     STATUS_ACTIVE = 'active'
     STATUS_INACTIVE = 'inactive'
-
+    STATUS_INVALIDE = 'invalide'
     CHOICES = [
         (STATUS_ACTIVE, 'Active', 'green'),
         (STATUS_INACTIVE, 'Inactive', 'red'),
+        (STATUS_INVALIDE, 'Invalide', 'red'),
     ]
     
 class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
@@ -239,14 +240,6 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
         verbose_name='Cluster Groups',
         blank = True
     )
-    
-    # successor_certificates = django_models.ManyToOneField(
-    #     'self',
-        
-    #     blank=True, 
-    #     # related_name='successor_certificate',
-    #     # on_delete=django_models.SET_NULL
-    # )
 
     class Meta:
         verbose_name_plural = "Certificates"
@@ -270,6 +263,3 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
     def sync(self):
         from adestis_netbox_certificate_management.jobs import CertificateMetadataExtractorJob
         CertificateMetadataExtractorJob.enqueue()
-        
-
-    
