@@ -54,11 +54,6 @@ class CertificateFilterSet(NetBoxModelFilterSet):
         queryset=Certificate.objects.all()
     )
     
-    # successor_certificates = django_filters.ModelMultipleChoiceFilter(
-    #     field_name='successor_certificates',
-    #     queryset=Certificate.objects.all()
-    # )
-    
     virtual_machine = django_filters.ModelMultipleChoiceFilter(
         field_name='virtual_machine',
         queryset=VirtualMachine.objects.all()
@@ -100,12 +95,6 @@ class CertificateFilterSet(NetBoxModelFilterSet):
         null_option='None',
         label=_('Supplier')
     )
-    
-    # device = DynamicModelMultipleChoiceField(
-    #     queryset=Device.objects.all(),
-    #     required = False,
-    #     label=_('Device (ID)'),
-    # )
     
     tenant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),

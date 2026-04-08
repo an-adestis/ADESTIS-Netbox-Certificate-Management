@@ -9,7 +9,6 @@ from adestis_netbox_certificate_management import views
 
 urlpatterns = (
 
-    # Certificates
     path('certificate/', CertificateListView.as_view(),
          name='certificate_list'),
     path('certificate/add/', CertificateEditView.as_view(),
