@@ -141,7 +141,7 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
         form = CertificateCRTForm(request.POST, request.FILES,)
         context = {
             'form': form,
-            'object': Certificate(),  # wichtig für object_edit.html
+            'object': Certificate(),  
             'return_url': reverse('plugins:adestis_netbox_certificate_management:certificate_list'),
         }
         return render(request, self.template_name, context)
@@ -155,7 +155,7 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                 filename = file.name.lower()
                 file_content = file.read()
 
-                # Handle PFX / P12 certificate files
+                
                 if filename.endswith('.pfx') or filename.endswith('.p12'):
                     pfx_password = form.cleaned_data.get('pfx_password') or ''  
                     try:
@@ -167,7 +167,6 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                             if not certs:
                                 raise ValidationError("No valid certificate found inside PFX file.")
                             
-                            # Process each individual certificate found
                             for single_cert in certs:
                                 cleaned_cert = single_cert.replace("\r\n", "").replace("\n", "").strip()
                                 existing_cert = Certificate.objects.filter(certificate=cleaned_cert)
@@ -178,15 +177,13 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                                 cert_data = cert_utils.parse_cert(single_cert)
                                 subject_key_identifier = cert_data.get("subject_key_identifier") or hashlib.sha1(cleaned_cert.encode()).hexdigest()
 
-                                # Extract Common Name (CN) from subject field
                                 common_name = cert_data.get("subject", "")
                                 for pair in cert_data.get("subject", "").split("\n"):
                                     if "=" in pair:
                                         name, value = pair.split("=")
                                         if name == "CN":
                                             common_name = value
-                                            
-                                # Create new Certificate object in database
+
                                 cert = Certificate.objects.create(
                                     certificate=cleaned_cert,
                                     name=common_name,
@@ -196,7 +193,6 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                                 created.append(cert)
 
                     except Exception as e:
-                        # Handle conversion or parsing errors
                         form.add_error(None, f"Import failed: {e}")
                         context = {
                             'form': form,
@@ -206,7 +202,6 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                         return render(request, self.template_name, context)
 
                 else:
-                    # Handle plain-text certificate files (.crt, .pem, etc.)
                     cert_text = file_content.decode()
                         
                     match = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", cert_text, flags=re.DOTALL) 
@@ -215,27 +210,23 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
 
                     for idx, single_cert in enumerate(match):
                         cleaned_cert = single_cert.replace("\r\n", "").replace("\n", "").strip()
-                        
-                        # Check for duplicate in the database     
+  
                         existing_cert = Certificate.objects.filter(certificate=cleaned_cert)
                         if existing_cert.exists():
                             existing_cert = existing_cert.first()
                             return redirect(existing_cert.get_absolute_url())
-                        
-                        # Parse certificate details    
+  
                         cert_data = cert_utils.parse_cert(single_cert)
-                        
-                        # Determine subject key identifier (fallback to SHA-1 hash if missing)    
+
                         subject_key_identifier = cert_data.get("subject_key_identifier")
                         if not subject_key_identifier:
                             subject_key_identifier = hashlib.sha1(cleaned_cert.encode()).hexdigest()
-                            
-                        # Extract Common Name (CN) from the subject    
+
                         common_name = cert_data["subject"]
                         for name,value in [ (pair.split("=")) for pair in cert_data["subject"].split("\n") ]:
                             if name == "CN":
                                 common_name=value
-                        # Save certificate to the database            
+         
                         cert = Certificate.objects.create(
                                 certificate=cleaned_cert,
                                 name=common_name,
@@ -243,11 +234,10 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
                                 status = CertificateStatusChoices.STATUS_ACTIVE
                         )
                         created.append(cert) 
-                        
-            # Redirect to certificate list view if any new certificates were created
+
             if created:
                     return redirect(reverse('plugins:adestis_netbox_certificate_management:certificate_list'))
-        # Re-render form with errors if validation fails
+
         context = {
             'form': form,
             'return_url': reverse('plugins:adestis_netbox_certificate_management:certificate_list'),
@@ -365,7 +355,6 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= Certificate
     table = CertificateTable
-    # template_name = "adestis_netbox_certificate_management/successor_certificates.html"
     actions = {
         'add': {'add'},
         'export': {'view'},
