@@ -146,7 +146,7 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
     )
     
     subject_alternative_name = django_models.CharField(
-        max_length=512,
+        max_length=2048,
         verbose_name='Subject Alternative Names',
         blank=True,
         null=True

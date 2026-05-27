@@ -1,0 +1,15 @@
+{% extends 'generic/object_children.html' %}
+{% load helpers %}
+{% load i18n %}
+{% load buttons %}
+{% load plugins %}
+{% load static %}
+
+{% block extra_controls %}
+  <form method="post" action="{% url 'plugins:adestis_netbox_certificate_management:certificate_inherit_from_parent' pk=object.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      <i class="mdi mdi-content-copy"></i> Inherit Fields from Parent
+    </button>
+  </form>
+{% endblock %}
