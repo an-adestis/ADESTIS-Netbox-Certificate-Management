@@ -704,8 +704,7 @@ class CertificateRemovePredecessor(ConfirmationForm):
         queryset=Certificate.objects.all(),
         widget=forms.MultipleHiddenInput()
     )
-    
-    
+
 class CertificateRemoveDevice(ConfirmationForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=Device.objects.all(),
