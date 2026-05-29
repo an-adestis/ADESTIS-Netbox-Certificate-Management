@@ -55,7 +55,7 @@ __all__ = (
     'CertificateRemoveApplicationView',
     'CertificateAffectedSuccessorCertificateView',
     
-    'CertificateInheritFromParentView',
+    'CertificateInheritFieldsView',
 
     'DeviceAffectedCertificateView',
     'ClusterAffectedCertificateView',
@@ -376,52 +376,71 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
     
     def get_children(self, request, parent):
         return Certificate.objects.restrict(request.user, 'view').filter(authority_key_identifier=parent)
-    
+
 import logging
 logger = logging.getLogger(__name__)
 
-class CertificateInheritFromParentView(View):
+@register_model_view(Certificate, 'inherit_fields')
+class CertificateInheritFieldsView(generic.ObjectEditView):
+    queryset = Certificate.objects.all()
+    form = CertificateInheritFieldsForm
+    template_name = 'adestis_netbox_certificate_management/inherit_fields.html'
+
+    def get(self, request, pk):
+        certificate = get_object_or_404(self.queryset, pk=pk)
+        form = self.form(certificate, initial=request.GET)
+
+        return render(request, self.template_name, {
+            'certificate': certificate,
+            'form': form,
+            'return_url': reverse('plugins:adestis_netbox_certificate_management:certificate', kwargs={'pk': pk}),
+            'edit_url': reverse('plugins:adestis_netbox_certificate_management:certificate_inherit_fields', kwargs={'pk': pk}),
+        })
+
     def post(self, request, pk):
-        parent = get_object_or_404(Certificate, pk=pk)
-        
-        # Alle Children dieses Zertifikats holen
-        children = Certificate.objects.filter(authority_key_identifier=parent)
-        
-        if not children.exists():
-            messages.error(request, "No child certificates found.")
-            return redirect('plugins:adestis_netbox_certificate_management:certificate', pk=pk)
+        certificate = get_object_or_404(self.queryset, pk=pk)
+        form = self.form(certificate, request.POST)
 
-        for certificate in children:
-            # ForeignKey Felder
-            changed = False
-            if parent.tenant and not certificate.tenant:
-                certificate.tenant = parent.tenant
-                changed = True
-            if parent.tenant_group and not certificate.tenant_group:
-                certificate.tenant_group = parent.tenant_group
-                changed = True
-            if parent.contact_group and not certificate.contact_group:
-                certificate.contact_group = parent.contact_group
-                changed = True
-            if changed:
-                certificate.save(update_fields=["tenant", "tenant_group", "contact_group"])
+        if form.is_valid():
+            source = form.cleaned_data['source_certificate']
+            logger.error(f"hier ist der source{source}")
+            with transaction.atomic():
+                if source.virtual_machine.exists():
+                    certificate.virtual_machine.add(*source.virtual_machine.all())
+                if source.device.exists():
+                    certificate.device.add(*source.device.all())
+                if source.installedapplication.exists():
+                    certificate.installedapplication.add(*source.installedapplication.all())
+                if source.contact.exists():
+                    certificate.contact.add(*source.contact.all())
+                if source.cluster.exists():
+                    certificate.cluster.add(*source.cluster.all())
+                if source.cluster_group.exists():
+                    certificate.cluster_group.add(*source.cluster_group.all())
 
-            # ManyToMany Felder
-            if parent.virtual_machine.exists():
-                certificate.virtual_machine.add(*parent.virtual_machine.all())
-            if parent.device.exists():
-                certificate.device.add(*parent.device.all())
-            if parent.installedapplication.exists():
-                certificate.installedapplication.add(*parent.installedapplication.all())
-            if parent.contact.exists():
-                certificate.contact.add(*parent.contact.all())
-            if parent.cluster.exists():
-                certificate.cluster.add(*parent.cluster.all())
-            if parent.cluster_group.exists():
-                certificate.cluster_group.add(*parent.cluster_group.all())
+                # ForeignKey Felder
+                changed = False
+                if source.tenant and not certificate.tenant:
+                    certificate.tenant = source.tenant
+                    changed = True
+                if source.tenant_group and not certificate.tenant_group:
+                    certificate.tenant_group = source.tenant_group
+                    changed = True
+                if source.contact_group and not certificate.contact_group:
+                    certificate.contact_group = source.contact_group
+                    changed = True
+                if changed:
+                    certificate.save(update_fields=["tenant", "tenant_group", "contact_group"])
 
-        messages.success(request, f"Fields successfully inherited by {children.count()} child certificate(s).")
-        return redirect('plugins:adestis_netbox_certificate_management:certificate', pk=pk)
+            
+            return redirect(certificate.get_absolute_url())
+
+        return render(request, self.template_name, {
+            'certificate': certificate,
+            'form': form,
+            'return_url': certificate.get_absolute_url(),
+            'edit_url': reverse('plugins:adestis_netbox_certificate_management:certificate_inherit_fields', kwargs={'pk': pk}),
+        })
         
 @register_model_view(Certificate, name='devices')
 class CertificateAffectedDeviceView(generic.ObjectChildrenView):

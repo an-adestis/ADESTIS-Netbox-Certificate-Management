@@ -4,9 +4,14 @@
 {% load helpers %}
 {% load plugins %}
 {% load i18n %}
-{% block extra_controls %}
-{% endblock %}
 {% load render_table from django_tables2 %}
+
+{% block extra_controls %}
+  <a href="{% url 'plugins:adestis_netbox_certificate_management:certificate_inherit_fields' pk=object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-primary">
+    <span class="mdi mdi-content-copy"></span> Inherit Fields
+  </a>
+{% endblock %}
+
 {% block content %}
   <div class="row my-3">
     <div class="col col-md-6">

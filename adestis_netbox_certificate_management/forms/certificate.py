@@ -45,6 +45,8 @@ __all__ = (
     'CertificateRemoveClusterGroup',
     'CertificateRemoveVirtualMachine',
     'CertificateRemoveTenant',
+    
+    'CertificateInheritFieldsForm',
 )
 
 class CertificateCRTForm(forms.ModelForm):
@@ -734,3 +736,18 @@ class CertificateRemoveTenant(ConfirmationForm):
         queryset=Tenant.objects.all(),
         widget=forms.MultipleHiddenInput()
     )
+
+class CertificateInheritFieldsForm(forms.Form):
+    
+    source_certificate = DynamicModelChoiceField(
+        label=_('Source Certificate'),
+        queryset=Certificate.objects.all()
+    )
+
+    class Meta:
+        fields = ['source_certificate']
+
+    def __init__(self, certificate, *args, **kwargs):
+        self.certificate = certificate
+        super().__init__(*args, **kwargs)
+        self.fields['source_certificate'].choices = []
