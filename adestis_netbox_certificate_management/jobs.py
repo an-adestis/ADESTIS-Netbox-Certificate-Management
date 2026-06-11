@@ -50,7 +50,7 @@ class CertificateMetadataExtractorJob(JobRunner):
 
         today = date.today()
         for certificate in certificates:
-            # Objekt neu aus DB laden, damit Status aktuell ist
+            
             certificate.refresh_from_db()
             if certificate.valid_to is None or certificate.valid_to < today:
                 certificate.status = CertificateStatusChoices.STATUS_INVALIDE
@@ -76,7 +76,6 @@ class CertificateMetadataExtractorJob(JobRunner):
 
         base_cert = match.pop(0)
 
-        # Subject Key Identifier auslesen
         try:
             x509cert = x509.load_pem_x509_certificate(
                 base_cert.encode('utf-8'),
@@ -90,7 +89,6 @@ class CertificateMetadataExtractorJob(JobRunner):
         except Exception as e:
             logger.error(f"[clean_and_extract] Fehler beim SKI-Auslesen für ID {certificate.id}: {e}")
 
-        # Metadaten per cert_utils auslesen
         try:
             cert_data = cert_utils.parse_cert(base_cert)
             logger.error(f"[cert_data Längen] ID {certificate.id}: { {k: len(str(v)) for k, v in cert_data.items()} }")
@@ -134,7 +132,6 @@ class CertificateMetadataExtractorJob(JobRunner):
         ])
         logger.debug(f"[clean_and_extract] Gespeichert für ID {certificate.id}")
 
-        # Zusätzliche Zertifikate in der Datei verarbeiten
         while match:
             extra_cert = match.pop(0)
             extra_data = cert_utils.parse_cert(extra_cert)
@@ -225,7 +222,6 @@ class CertificateMetadataExtractorJob(JobRunner):
         certificate.key_technology = cert_data.get("key_technology", "")
         certificate.subject_alternative_name = cert_data.get("SubjectAlternativeName", "")
 
-        # Nur einmal speichern am Ende
         certificate.save(update_fields=[
             "subject_key_identifier",
             "valid_from",

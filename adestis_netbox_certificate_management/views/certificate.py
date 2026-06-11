@@ -418,7 +418,6 @@ class CertificateInheritFieldsView(generic.ObjectEditView):
                 if source.cluster_group.exists():
                     certificate.cluster_group.add(*source.cluster_group.all())
 
-                # ForeignKey Felder
                 changed = False
                 if source.tenant and not certificate.tenant:
                     certificate.tenant = source.tenant
