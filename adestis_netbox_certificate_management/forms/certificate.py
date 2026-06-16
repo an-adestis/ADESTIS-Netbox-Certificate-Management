@@ -185,7 +185,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
     )
     
     name = forms.CharField(
-        required=False,
+        required=True,
         max_length = 150,
         label=_("Name"),
     )
@@ -197,7 +197,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
     )
     
     status = forms.ChoiceField(
-        required=False,
+        required=True,
         choices=CertificateStatusChoices,
     )
     

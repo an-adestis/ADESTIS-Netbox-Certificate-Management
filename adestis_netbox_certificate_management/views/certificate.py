@@ -129,7 +129,6 @@ class CertificateBulkEditView(generic.BulkEditView):
     table = CertificateTable
     form =  CertificateBulkEditForm
     
-
 class CertificateBulkImportView(generic.BulkImportView):
     queryset = Certificate.objects.all()
     model_form = CertificateCSVForm
@@ -139,8 +138,6 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
     queryset = Certificate.objects.all()
     template_name = 'adestis_netbox_certificate_management/crt_import.html'
     
-
-        
     def get(self, request):
         form = CertificateCRTForm(request.POST, request.FILES,)
         context = {
@@ -377,9 +374,6 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
     def get_children(self, request, parent):
         return Certificate.objects.restrict(request.user, 'view').filter(authority_key_identifier=parent)
 
-import logging
-logger = logging.getLogger(__name__)
-
 @register_model_view(Certificate, 'inherit_fields')
 class CertificateInheritFieldsView(generic.ObjectEditView):
     queryset = Certificate.objects.all()
@@ -403,7 +397,6 @@ class CertificateInheritFieldsView(generic.ObjectEditView):
 
         if form.is_valid():
             source = form.cleaned_data['source_certificate']
-            logger.error(f"hier ist der source{source}")
             with transaction.atomic():
                 if source.virtual_machine.exists():
                     certificate.virtual_machine.add(*source.virtual_machine.all())
@@ -430,7 +423,6 @@ class CertificateInheritFieldsView(generic.ObjectEditView):
                     changed = True
                 if changed:
                     certificate.save(update_fields=["tenant", "tenant_group", "contact_group"])
-
             
             return redirect(certificate.get_absolute_url())
 

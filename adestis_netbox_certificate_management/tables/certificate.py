@@ -76,6 +76,8 @@ class CertificateTable(NetBoxTable):
     authority_key_identifier = tables.Column(
         linkify=True
     )
+    
+    tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
         model = Certificate

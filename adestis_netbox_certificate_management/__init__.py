@@ -12,6 +12,8 @@ class AdestisCertificateConfig(PluginConfig):
     default_settings = {
         'top_level_menu' : True,
     }
+    docs_url = 'https://github.com/an-adestis/ADESTIS-Netbox-Certificate-Management/wiki'
+    scripts = ['adestis_netbox_certifivate_management.scripts.MergeCertificatesScript']
 
 config = AdestisCertificateConfig
 default_app_config = "adestis_netbox_certificate_management.apps.AdestisCertificateManagementAppConfig"
