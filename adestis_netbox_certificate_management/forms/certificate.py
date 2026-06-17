@@ -45,6 +45,8 @@ __all__ = (
     'CertificateRemoveClusterGroup',
     'CertificateRemoveVirtualMachine',
     'CertificateRemoveTenant',
+    
+    'CertificateInheritFieldsForm',
 )
 
 class CertificateCRTForm(forms.ModelForm):
@@ -183,7 +185,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
     )
     
     name = forms.CharField(
-        required=False,
+        required=True,
         max_length = 150,
         label=_("Name"),
     )
@@ -195,7 +197,7 @@ class CertificateBulkEditForm(NetBoxModelBulkEditForm):
     )
     
     status = forms.ChoiceField(
-        required=False,
+        required=True,
         choices=CertificateStatusChoices,
     )
     
@@ -704,8 +706,7 @@ class CertificateRemovePredecessor(ConfirmationForm):
         queryset=Certificate.objects.all(),
         widget=forms.MultipleHiddenInput()
     )
-    
-    
+
 class CertificateRemoveDevice(ConfirmationForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=Device.objects.all(),
@@ -735,3 +736,18 @@ class CertificateRemoveTenant(ConfirmationForm):
         queryset=Tenant.objects.all(),
         widget=forms.MultipleHiddenInput()
     )
+
+class CertificateInheritFieldsForm(forms.Form):
+    
+    source_certificate = DynamicModelChoiceField(
+        label=_('Source Certificate'),
+        queryset=Certificate.objects.all()
+    )
+
+    class Meta:
+        fields = ['source_certificate']
+
+    def __init__(self, certificate, *args, **kwargs):
+        self.certificate = certificate
+        super().__init__(*args, **kwargs)
+        self.fields['source_certificate'].choices = []

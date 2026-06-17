@@ -84,45 +84,30 @@ class CertificateFilterSet(NetBoxModelFilterSet):
         queryset=InstalledApplication.objects.all()
     )
     
-    contact_group_id = django_filters.ModelMultipleChoiceFilter(
+    contact_group = django_filters.ModelMultipleChoiceFilter(
+        field_name='contact_group',
         queryset=ContactGroup.objects.all(),
-        label=_('Supplier (ID)'),
+        label=_('Supplier'),
     )
     
-    contact_group = DynamicModelMultipleChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label=_('Supplier')
-    )
-    
-    tenant_id = django_filters.ModelMultipleChoiceFilter(
+    tenant = django_filters.ModelMultipleChoiceFilter(
+        field_name='tenant',
         queryset=Tenant.objects.all(),
-        label=_('Tenant (Name)'),
+        label=_('Tenant'),
     )
-    
-    tenant = DynamicModelMultipleChoiceField(
-        queryset=Tenant.objects.all(),
-        required=False,
-        label=_('Tenant (ID)'),
+
+    tenant_group = django_filters.ModelMultipleChoiceFilter(
+        field_name='tenant_group',
+        queryset=TenantGroup.objects.all(),
+        label=_('Tenant Group'),
     )
-    
-    issuer_parent_certificate= DynamicModelMultipleChoiceField(
+
+    issuer_parent_certificate = django_filters.ModelMultipleChoiceFilter(
+        field_name='authority_key_identifier',
         queryset=Certificate.objects.all(),
-        required=False,
-        label=_('Issuer (name)'),
+        label=_('Issuer'),
     )
     
-    tenant_group_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=TenantGroup.objects.all(),
-        label=_('Tenant Group (ID)'),
-    )
-    
-    tenant_group = DynamicModelMultipleChoiceField(
-        queryset=TenantGroup.objects.all(),
-        required=False,
-        label=_('Tenant Group (name)'),
-    )
     class Meta:
         model = Certificate
         fields = ['id', 'status', 'name', 'valid_from', 'valid_to', 'tenant', 'tenant_group', 'virtual_machine', 'device', 'cluster', 'cluster_group', 'installedapplication', 'subject', 'issuer_parent_certificate', 'key_technology', 'subject_alternative_name', 'contact', 'contact_group']

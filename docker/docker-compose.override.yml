@@ -1,13 +1,13 @@
 name: "local_docker_netbox_account_management_plugin"
 services:
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "a.nabiyev@adestis.de"
-      PGADMIN_DEFAULT_PASSWORD: "123456"
-    ports:
-    - "13001:80"
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: "a.nabiyev@adestis.de"
+  #     PGADMIN_DEFAULT_PASSWORD: "123456"
+  #   ports:
+  #   - "13001:80"
   netbox: &netbox
     image: adestis-netbox-certificate-management-plugin:latest
     user: root
@@ -15,7 +15,7 @@ services:
       context: ../
       dockerfile: Dev-Dockerfile
     depends_on:
-    - postgres
+    # - postgres
     - redis
     - redis-cache
     ports:

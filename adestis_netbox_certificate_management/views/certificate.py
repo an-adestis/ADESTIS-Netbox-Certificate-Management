@@ -37,8 +37,10 @@ from pathlib import Path
 from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
 from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 
-
+from django.views import View
 
 __all__ = (
     'CertificateView',
@@ -52,6 +54,8 @@ __all__ = (
     'CertificateBulkImportCertificateView',
     'CertificateRemoveApplicationView',
     'CertificateAffectedSuccessorCertificateView',
+    
+    'CertificateInheritFieldsView',
 
     'DeviceAffectedCertificateView',
     'ClusterAffectedCertificateView',
@@ -125,7 +129,6 @@ class CertificateBulkEditView(generic.BulkEditView):
     table = CertificateTable
     form =  CertificateBulkEditForm
     
-
 class CertificateBulkImportView(generic.BulkImportView):
     queryset = Certificate.objects.all()
     model_form = CertificateCSVForm
@@ -135,8 +138,6 @@ class CertificateBulkImportCertificateView(generic.ObjectEditView):
     queryset = Certificate.objects.all()
     template_name = 'adestis_netbox_certificate_management/crt_import.html'
     
-
-        
     def get(self, request):
         form = CertificateCRTForm(request.POST, request.FILES,)
         context = {
@@ -355,6 +356,7 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
     queryset = Certificate.objects.all()
     child_model= Certificate
     table = CertificateTable
+    template_name = 'adestis_netbox_certificate_management/certificate_inherit.html'
     actions = {
         'add': {'add'},
         'export': {'view'},
@@ -371,6 +373,65 @@ class CertificateAffectedSuccessorCertificateView(generic.ObjectChildrenView):
     
     def get_children(self, request, parent):
         return Certificate.objects.restrict(request.user, 'view').filter(authority_key_identifier=parent)
+
+@register_model_view(Certificate, 'inherit_fields')
+class CertificateInheritFieldsView(generic.ObjectEditView):
+    queryset = Certificate.objects.all()
+    form = CertificateInheritFieldsForm
+    template_name = 'adestis_netbox_certificate_management/inherit_fields.html'
+
+    def get(self, request, pk):
+        certificate = get_object_or_404(self.queryset, pk=pk)
+        form = self.form(certificate, initial=request.GET)
+
+        return render(request, self.template_name, {
+            'certificate': certificate,
+            'form': form,
+            'return_url': reverse('plugins:adestis_netbox_certificate_management:certificate', kwargs={'pk': pk}),
+            'edit_url': reverse('plugins:adestis_netbox_certificate_management:certificate_inherit_fields', kwargs={'pk': pk}),
+        })
+
+    def post(self, request, pk):
+        certificate = get_object_or_404(self.queryset, pk=pk)
+        form = self.form(certificate, request.POST)
+
+        if form.is_valid():
+            source = form.cleaned_data['source_certificate']
+            with transaction.atomic():
+                if source.virtual_machine.exists():
+                    certificate.virtual_machine.add(*source.virtual_machine.all())
+                if source.device.exists():
+                    certificate.device.add(*source.device.all())
+                if source.installedapplication.exists():
+                    certificate.installedapplication.add(*source.installedapplication.all())
+                if source.contact.exists():
+                    certificate.contact.add(*source.contact.all())
+                if source.cluster.exists():
+                    certificate.cluster.add(*source.cluster.all())
+                if source.cluster_group.exists():
+                    certificate.cluster_group.add(*source.cluster_group.all())
+
+                changed = False
+                if source.tenant and not certificate.tenant:
+                    certificate.tenant = source.tenant
+                    changed = True
+                if source.tenant_group and not certificate.tenant_group:
+                    certificate.tenant_group = source.tenant_group
+                    changed = True
+                if source.contact_group and not certificate.contact_group:
+                    certificate.contact_group = source.contact_group
+                    changed = True
+                if changed:
+                    certificate.save(update_fields=["tenant", "tenant_group", "contact_group"])
+            
+            return redirect(certificate.get_absolute_url())
+
+        return render(request, self.template_name, {
+            'certificate': certificate,
+            'form': form,
+            'return_url': certificate.get_absolute_url(),
+            'edit_url': reverse('plugins:adestis_netbox_certificate_management:certificate_inherit_fields', kwargs={'pk': pk}),
+        })
         
 @register_model_view(Certificate, name='devices')
 class CertificateAffectedDeviceView(generic.ObjectChildrenView):

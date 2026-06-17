@@ -9,6 +9,8 @@ from adestis_netbox_certificate_management.models import *
 import django_tables2 as tables
 
 
+from netbox.tables import columns
+
 class CertificateTable(NetBoxTable):
     
     actions = columns.ActionsColumn(
@@ -32,51 +34,50 @@ class CertificateTable(NetBoxTable):
     valid_to = columns.DateColumn()
     
     tenant = tables.Column(
-        linkify = True
+        linkify=True
     )
     
     tenant_group = tables.Column(
-        linkify = True
+        linkify=True
     )
 
     description = columns.MarkdownColumn()
-    
 
-    
-    installedapplication = tables.Column(
-        linkify=True
+    installedapplication = columns.ManyToManyColumn(
+        linkify_item=True
     )
     
-    contact = tables.Column(
-        linkify=True
+    contact = columns.ManyToManyColumn(
+        linkify_item=True
     )
     
-    virtual_machine = tables.Column(
-        linkify=True
+    virtual_machine = columns.ManyToManyColumn(
+        linkify_item=True
     )
     
-    cluster_group = tables.Column(
-        linkify=True
+    cluster_group = columns.ManyToManyColumn(
+        linkify_item=True
     )
         
-    cluster = tables.Column(
-        linkify=True
+    cluster = columns.ManyToManyColumn(
+        linkify_item=True
     )
         
-    device = tables.Column(
-        linkify=True
+    device = columns.ManyToManyColumn(
+        linkify_item=True
     )
     
     issuer_parent_certificate = tables.Column(
         linkify=True
     )
     
-    issuer = columns.MarkdownColumn(
-    )
+    issuer = columns.MarkdownColumn()
     
     authority_key_identifier = tables.Column(
         linkify=True
     )
+    
+    tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
         model = Certificate

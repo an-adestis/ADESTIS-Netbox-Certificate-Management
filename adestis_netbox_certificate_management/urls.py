@@ -63,5 +63,7 @@ urlpatterns = (
          name='certificatetenants_list'), 
     
      path("certificate/run/", views.run_myjob, name="run_myjob"),
+     
+     path('certificates/<int:pk>/inherit-fields/', views.CertificateInheritFieldsView.as_view(), name='certificate_inherit_fields'),
 
 )

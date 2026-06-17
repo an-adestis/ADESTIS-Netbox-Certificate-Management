@@ -51,7 +51,7 @@ class CertificateStatusChoices(ChoiceSet):
         (STATUS_INVALIDE, 'Invalide', 'red'),
     ]
     
-class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
+class Certificate(NetBoxModel):
 
     status = django_models.CharField(
         max_length=50,
@@ -59,8 +59,6 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
         verbose_name='Status',
         help_text='Status'
     )
-    
-    tags = TaggableManager(through=TaggedItem)
     
     format = django_models.CharField(
         max_length=50, 
@@ -146,7 +144,7 @@ class Certificate(CloningMixin, ExportTemplatesMixin, ChangeLoggedModel):
     )
     
     subject_alternative_name = django_models.CharField(
-        max_length=512,
+        max_length=2048,
         verbose_name='Subject Alternative Names',
         blank=True,
         null=True
